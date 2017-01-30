@@ -1,8 +1,8 @@
 {
-  "name": "temp",
+  "name": "kronk",
   "version": "0.0.1",
   "bin": {
-    "sws": "./scripts/sws.js"
+    "sws": "./scripts/kronk.js"
   },
   "dependencies": {
     "markdown-it": "^8.2.2",
