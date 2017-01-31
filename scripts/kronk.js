@@ -6,19 +6,22 @@ const fs = require('fs')
 const mkdirp = require('mkdirp')
 const c = require('colors')
 
+const deepmerge = require('deepmerge')
+
 const toml = require('toml')
 const yaml = require('yamljs')
 const rr = require('recursive-readdir')
 
-const pug = require('pug')
-const md = new (require('markdown-it'))()
-
 // First, find the config file.
 var config = null
 
-const W = c.bold.yellow(' /!\\ ')
-const E = c.bold.red(' !! ')
-const N = c.bold.green(' => ')
+const W = c.bold.yellow(' \u2717 ')
+const E = c.bold.red(' \u2717 ')
+const N = c.bold.green(' \u2713 ')
+
+const _file = require('../lib/file')
+const FileArray = _file.FileArray
+const File = _file.File
 
 while (process.cwd() !== '/') {
 
@@ -49,103 +52,57 @@ config.pug = config.pug || {}
 // used mostly for markdown
 config.pug.default_block = config.pug.default_block || 'content'
 
-const meta = /^(\+\+\+|\-\-\-|\.\.\.)((?:.|\r?\n)*)\1$((?:.|\r?\n)*)/m
-
-class FileArray extends Array {
-
-  in(dir) {
-    if (!dir[dir.length - 1] === '/')
-      dir = dir + '/'
-
-    return this.filter(f => f.name.indexOf(dir) === 0)
-  }
-
-}
-
 process.chdir(config.src_dir)
 
 rr('.', function (err, results) {
 
   var files = new FileArray()
+  var meta_stack = []
 
-  for (var file of results) {
-    var contents = fs.readFileSync(file, 'utf-8')
-    var parsed_file = meta.exec(contents)
+  results.sort()
 
-    if (!parsed_file) {
-      // FIXME issue a warning
-      console.warn(`${W} ${c.yellow(file)} does not have a meta section.`)
-      continue
-    }
-
-    var meta_type = parsed_file[1] === '+++' ? 'toml' :
-      parsed_file[1] === '---' ? 'yaml' : 'json'
-
-    var meta_section = parsed_file[2]
-    var content_section = parsed_file[3]
-    var parsed_meta = null
+  for (var filename of results) {
+    var contents = fs.readFileSync(filename, 'utf-8')
 
     try {
-      if (meta_type === 'toml')
-        parsed_meta = toml.parse(meta_section)
-      else if (meta_type === 'yaml')
-        parsed_meta = yaml.load(meta_section)
-      else
-        parsed_meta = JSON.parse(meta_section)
+      var file = new File(filename, contents)
+      files.push(file)
+      file.$files = files
+      file.$conf = config
+
+      while (meta_stack.length && file.dirname.indexOf(meta_stack[meta_stack.length - 1].dirname) === -1) {
+        meta_stack.pop()
+      }
+
+      file.meta = deepmerge((meta_stack[meta_stack.length - 1] || {}).meta || {}, file.meta)
+
+      if (file.noextbasename === '__meta__') {
+        meta_stack.push(file)
+      }
+
+      // console.log(file.filename, file.meta)
+
     } catch (e) {
-      console.warn(`${file} error in meta ${e.message} (${meta_type})`)
+      console.warn(`${W} ${c.yellow(filename)} ${e.message}`)
     }
 
-    var ext = path.extname(file)
-
-    files.push({
-      full_name: file,
-      name: file.replace(new RegExp(`${ext}$`, 'i'), ''),
-      basename: path.basename(file),
-      dirname: path.dirname(file),
-      ext: ext,
-      meta: parsed_meta,
-      contents: content_section
-    })
   }
-
-  // console.log(files)
 
   var build_dir = path.join(config.project_dir, config.build_dir)
 
   for (var f of files) {
-    // skip files starting with '_'
-    if (f.basename[0] === '_') continue
 
-    var rendered = 'nothing to see here, move along.'
+    if (!f.renderable()) continue
 
-    if (f.ext === '.md') {
-
-      rendered = md.render(f.contents)
-
-    } else if (f.ext === '.pug') {
-
-      try {
-        rendered = pug.compile(f.contents, {
-          filename: f.name,
-          basedir: path.join(config.project_dir, config.templates_dir),
-          pretty: config.pug.pretty
-        })({
-          $file: f,
-          $conf: config,
-          $files: files
-        })
-      } catch (e) {
-        console.error(`${E} ${c.red(f.full_name)} ${e.message}`)
-        continue
-      }
-
+    try {
+      var rendered = f.render(config)
+      mkdirp.sync(path.join(build_dir, f.dirname))
+      fs.writeFileSync(path.join(build_dir, f.name + '.html'), rendered, {encoding: 'utf-8'})
+      var html_file = f.name + '.html'
+      console.log(`${N} ${c.green(html_file)}`)
+    } catch (e) {
+      console.error(`${E} ${c.red(f.filename)} ${e.message}`)
+      continue
     }
-
-    mkdirp.sync(path.join(build_dir, f.dirname))
-    fs.writeFileSync(path.join(build_dir, f.name + '.html'), rendered, {encoding: 'utf-8'})
-    var html_file = f.name + '.html'
-    console.log(`${N} ${c.green(html_file)}`)
-    // Render in their respective folder.
   }
 })
