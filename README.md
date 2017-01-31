@@ -27,14 +27,16 @@ metadata that indicates which format we deal with.
 
 We use `+++` for toml, `---` for yaml and `...` for json.
 
+In the case of json, the `{` and `}` surrounding the object are optional.
+
 In pug templates we can access this metadata directly as it is injected into the locals.
 
 
 ```jade
-+++
-# This is a toml metadata section.
+...
+// This is a json5 metadata section.
 title = 'my title'
-+++
+...
 
 h1 Displaying the title : #{title}
 
