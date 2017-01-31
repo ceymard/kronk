@@ -31,6 +31,7 @@ In the case of json, the `{` and `}` surrounding the object are optional.
 
 In pug templates we can access this metadata directly as it is injected into the locals.
 
+Do not use the `kronk` key for you own data as it has a special meaning.
 
 ```jade
 ...
@@ -66,9 +67,9 @@ Special metadata variables
 
 Here is the list of variables that kronk uses inside the file metadata ;
 
-* `$kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
-* `$kronk.markdown_block` is the name of the block inside this template.
-* `$kronk.draft` if true, this file will not be generated
+* `kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
+* `kronk.markdown_block` is the name of the block inside this template.
+* `kronk.draft` if true, this file will not be generated
 
 * `$files` the array of all the files parsed inside the `src` directory
 * `$file` the current file

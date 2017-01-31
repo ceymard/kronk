@@ -20,7 +20,7 @@ const E = c.bold.red(' \u2717 ')
 const N = c.bold.green(' \u2713 ')
 
 const _file = require('../lib/file')
-const FileArray = _file.FileArray
+const FileArray = _file.FileMap
 const File = _file.File
 
 while (process.cwd() !== '/') {
@@ -66,7 +66,7 @@ rr('.', function (err, results) {
 
     try {
       var file = new File(filename, contents)
-      files.push(file)
+      files.add(file)
       file.$files = files
       file.$conf = config
       file.stat = fs.statSync(filename)
@@ -89,9 +89,9 @@ rr('.', function (err, results) {
 
   var build_dir = path.join(config.project_dir, config.build_dir)
 
-  for (var f of files) {
+  files.forEach(f => {
 
-    if (!f.renderable()) continue
+    if (!f.renderable()) return
 
     try {
       var rendered = f.render(config)
@@ -101,7 +101,7 @@ rr('.', function (err, results) {
       console.log(`${N} ${c.green(html_file)}`)
     } catch (e) {
       console.error(`${E} ${c.red(f.filename)} ${e.message}`)
-      continue
+      return
     }
-  }
+  })
 })
