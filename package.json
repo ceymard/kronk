@@ -2,7 +2,7 @@
   "name": "kronk",
   "version": "0.0.1",
   "bin": {
-    "sws": "./scripts/kronk.js"
+    "kronk": "./scripts/kronk.js"
   },
   "dependencies": {
     "markdown-it": "^8.2.2",
