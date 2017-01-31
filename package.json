@@ -5,6 +5,7 @@
     "kronk": "./scripts/kronk.js"
   },
   "dependencies": {
+    "colors": "^1.1.2",
     "markdown-it": "^8.2.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",

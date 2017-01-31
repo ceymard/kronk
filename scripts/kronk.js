@@ -4,6 +4,7 @@ const path = require('path')
 const fs = require('fs')
 
 const mkdirp = require('mkdirp')
+const c = require('colors')
 
 const toml = require('toml')
 const yaml = require('yamljs')
@@ -14,6 +15,10 @@ const md = new (require('markdown-it'))()
 
 // First, find the config file.
 var config = null
+
+const W = c.bold.yellow(' /!\\ ')
+const E = c.bold.red(' !! ')
+const N = c.bold.green(' => ')
 
 while (process.cwd() !== '/') {
 
@@ -47,12 +52,14 @@ config.pug.default_block = config.pug.default_block || 'content'
 const meta = /^(\+\+\+|\-\-\-|\.\.\.)((?:.|\r?\n)*)\1$((?:.|\r?\n)*)/m
 
 class FileArray extends Array {
+
   in(dir) {
     if (!dir[dir.length - 1] === '/')
       dir = dir + '/'
 
     return this.filter(f => f.name.indexOf(dir) === 0)
   }
+
 }
 
 process.chdir(config.src_dir)
@@ -67,7 +74,7 @@ rr('.', function (err, results) {
 
     if (!parsed_file) {
       // FIXME issue a warning
-      console.warn(`/!\\ ${file} does not have a meta section.`)
+      console.warn(`${W} ${c.yellow(file)} does not have a meta section.`)
       continue
     }
 
@@ -92,6 +99,7 @@ rr('.', function (err, results) {
     var ext = path.extname(file)
 
     files.push({
+      full_name: file,
       name: file.replace(new RegExp(`${ext}$`, 'i'), ''),
       basename: path.basename(file),
       dirname: path.dirname(file),
@@ -117,21 +125,27 @@ rr('.', function (err, results) {
 
     } else if (f.ext === '.pug') {
 
-      rendered = pug.compile(f.contents, {
-        filename: f.name,
-        basedir: path.join(config.project_dir, config.templates_dir),
-        pretty: config.pug.pretty
-      })({
-        file: f,
-        conf: config,
-        files: files
-      })
+      try {
+        rendered = pug.compile(f.contents, {
+          filename: f.name,
+          basedir: path.join(config.project_dir, config.templates_dir),
+          pretty: config.pug.pretty
+        })({
+          $file: f,
+          $conf: config,
+          $files: files
+        })
+      } catch (e) {
+        console.error(`${E} ${c.red(f.full_name)} ${e.message}`)
+        continue
+      }
 
     }
 
     mkdirp.sync(path.join(build_dir, f.dirname))
     fs.writeFileSync(path.join(build_dir, f.name + '.html'), rendered, {encoding: 'utf-8'})
-    console.log(` => ${f.name}.html`)
+    var html_file = f.name + '.html'
+    console.log(`${N} ${c.green(html_file)}`)
     // Render in their respective folder.
   }
 })
