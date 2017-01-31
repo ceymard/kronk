@@ -80,8 +80,6 @@ rr('.', function (err, results) {
         meta_stack.push(file)
       }
 
-      // console.log(file.filename, file.meta)
-
     } catch (e) {
       console.warn(`${W} ${c.yellow(filename)} ${e.message}`)
     }
