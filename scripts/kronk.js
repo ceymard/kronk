@@ -69,6 +69,7 @@ rr('.', function (err, results) {
       files.push(file)
       file.$files = files
       file.$conf = config
+      file.stat = fs.statSync(filename)
 
       while (meta_stack.length && file.dirname.indexOf(meta_stack[meta_stack.length - 1].dirname) === -1) {
         meta_stack.pop()
