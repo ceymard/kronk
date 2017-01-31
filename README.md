@@ -35,7 +35,7 @@ In pug templates we can access this metadata directly as it is injected into the
 ```jade
 ...
 // This is a json5 metadata section.
-title = 'my title'
+title: 'my title'
 ...
 
 h1 Displaying the title : #{title}
@@ -66,8 +66,9 @@ Special metadata variables
 
 Here is the list of variables that kronk uses inside the file metadata ;
 
-* `kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
-* `kronk.markdown_block` is the name of the block inside this template.
+* `$kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
+* `$kronk.markdown_block` is the name of the block inside this template.
+* `$kronk.draft` if true, this file will not be generated
 
 * `$files` the array of all the files parsed inside the `src` directory
 * `$file` the current file
