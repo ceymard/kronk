@@ -1,5 +1,4 @@
-Kronk, a simple static website generator
-========================================
+# Kronk, a simple static website generator
 
 Kronk helps you create your static website, be it a blog or any other kind
 of presentational content that don't really require any kind of logic.
@@ -19,9 +18,7 @@ It uses the following great software :
 * [Toml](https://github.com/toml-lang/toml) because choice is good
 * [Yaml](http://yaml.org/) because even more choice is even better
 
-
-TL;DR
-=====
+# TL;DR
 
 ```sh
 $ npm install -g kronk
@@ -30,8 +27,7 @@ $ cd kronk-sample-site
 $ kronk
 ```
 
-Getting Started
-===============
+# Getting Started
 
 For kronk to build a site, it needs a `package.json` file at the root of the project with
 at least a `"kronk": {}` entry in it. This variable can hold the following values ;
