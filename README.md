@@ -11,8 +11,14 @@ much hassle.
 
 This is why this documentation is on the light side ; kronk simply does not do much.
 
-It mostly relies on pug for the templating side, markdown when you want to stay simple and
-`toml`, `yaml` and `json5` for the metadata definition.
+It uses the following great software :
+
+* [Pug](https://pugjs.org/) for templating (formerly known as jade)
+* [Markdown-it](https://github.com/markdown-it/markdown-it) for the markdown side
+* [Json5](http://json5.org/) because it is nicer than plain json
+* [Toml](https://github.com/toml-lang/toml) because choice is good
+* [Yaml](http://yaml.org/) because even more choice is even better
+
 
 TL;DR
 =====
@@ -54,6 +60,12 @@ those that will be can still access their metadata in their templates.
 To get a hang of kronk, try cloning the [sample project](https://github.com/ceymard/kronk-sample-site).
 
 # Metadata
+
+All files in kronk are associated to metadata. Some files are even pure metadata.
+What you put in it is entirely up to you, as **we make no assumption what you should use**.
+
+The only exception is [the `kronk` object](#kronkobj), as its value can change the way
+kronk behaves.
 
 ## File Meta
 
@@ -166,6 +178,10 @@ is possible using the `#{variable}` syntax.
 
 If you wish to override these defaults, use the `kronk.markdown_template` and `kronk.markdown_block` file metadata variables.
 
+Note that by default there is no code highlighting included ; you will have to use
+a `__meta__.js` file including `highlight.js` or another highlighting library into the
+`kronk.markdown_options` object.
+
 # API
 
 <a name="FileArray"/>
@@ -214,6 +230,7 @@ The file object holds informations about a file that has been read by kronk.
 * `meta: object` the parsed metadata with `__meta__` files already merged into it. *not enumerable*
 * `$files: FileArray` the FileArray this File belongs to. *not enumerable*
 
+<a name="kronkobj"/>
 ## Special metadata variables
 
 Some metadata values are interpreted by kronk and not left only to your templates.
