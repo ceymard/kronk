@@ -12,7 +12,7 @@ much hassle.
 This is why this documentation is on the light side ; kronk simply does not do much.
 
 It mostly relies on pug for the templating side, markdown when you want to stay simple and
-toml, yaml and json5 for the metadata definition.
+`toml`, `yaml` and `json5` for the metadata definition.
 
 Getting Started
 ===============
@@ -23,16 +23,20 @@ at least a `"kronk": {}` entry in it. This variable can hold the following value
 ```json
   // ...
   "kronk": {
-    "src": "<the directory containing the site sources, relative to the package.json>",
-    "template": "<the directory containing the pug templates, relative to the package.json>",
-    "build": "<the directory where the generated files will be placed>"
+    "src": "<the directory containing the site sources, defaults to 'src'>",
+    "template": "<the directory containing the pug templates, defaults to 'template'>",
+    "build": "<the directory where the generated files will be placed, defaults to 'build'>"
   },
   // ...
 ```
 
+Kronk uses a `package.json` to allow you to install libraries that you can use in
+javascript files in the `src` directory. FIXME : section about javascript files.
 
-File Metadata
+Metadata
 =============
+
+## File Meta
 
 Like hugo or jekyll, kronk allows you to define metadata in the very files that
 are to be rendered at their begining. A simple marker is used before and after the
@@ -57,17 +61,7 @@ h1 Displaying the title : #{title}
 
 ```
 
-Markdown Handling
-=================
-
-Markdown is always injected in the end into a pug template, which is by default `/markdown.pug` into
-the `markdown` block by default.
-
-If you wish to override these defaults, use the `kronk.markdown_template` and `kronk.markdown_block` file metadata variables.
-
-
-Metadata Inheritance
-====================
+## Inheritance
 
 Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
 all the other files will merge its content into their own metadata.
@@ -78,8 +72,47 @@ In the case that we have a `__meta__.js`, the metadata will be looked inside the
 variable.
 
 
-Special metadata variables
-==========================
+# Javascript Files
+
+To allow for maximal flexibility, you can have plain javascript files in your `src/` directory.
+
+These files are not rendered like `.pug` or `.md` files ; instead, kronk expects their `module.exports`
+to be a function.
+
+```javascript
+// Example of a javascript file that uses a template not normally rendered to
+// render it multiple times.
+
+/**
+ * @param $file: the current file object
+ * @param $files: The global files array
+ */
+module.exports = function ($file, $files) {
+
+  var template = $files.get('docs/_category')
+
+  for (var meta of $files.in('docs').map(f => f.meta)) {
+    template.render({
+      output_filename: `docs/category_${meta.tag}.html`,
+      // ... add some other variables for the template to use
+    })
+  }
+}
+
+```
+
+`.js` files can also be used as a `__meta__.js` entry, which will then use the `module.exports` to merge
+
+# Markdown Handling
+
+Markdown is always injected in the end into a pug template, which is by default `/markdown.pug` into
+the `markdown` block by default.
+
+If you wish to override these defaults, use the `kronk.markdown_template` and `kronk.markdown_block` file metadata variables.
+
+# API
+
+## Special metadata variables
 
 Here is the list of variables that kronk uses inside the file metadata ;
 
