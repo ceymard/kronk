@@ -215,3 +215,7 @@ They all live inside the `kronk` object to avoid clashing with your own naming.
    *default* `/markdown.pug`.
 
 * `kronk.markdown_block` is the name of the block inside the markdown template. *default* `'markdown'`
+
+* `kronk.markdown_options` the options object given to markdown-it. *default* `{}`
+
+* `kronk.pug_options` the options object given to pug compile function. *default* `{}`

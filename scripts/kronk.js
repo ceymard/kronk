@@ -93,7 +93,7 @@ rr('.', function (err, results) {
     try {
       f.render()
     } catch (e) {
-      console.error(`${E} ${c.red(f.filename)} ${e.message}`)
+      console.error(`${E} ${c.red(f.filename)} ${e.stack}`)
       continue
     }
   }
