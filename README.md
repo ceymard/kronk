@@ -14,6 +14,16 @@ This is why this documentation is on the light side ; kronk simply does not do m
 It mostly relies on pug for the templating side, markdown when you want to stay simple and
 `toml`, `yaml` and `json5` for the metadata definition.
 
+TL;DR
+=====
+
+```sh
+$ npm install -g kronk
+$ git clone https://github.com/ceymard/kronk-sample-site
+$ cd kronk-sample-site
+$ kronk
+```
+
 Getting Started
 ===============
 
@@ -30,11 +40,20 @@ at least a `"kronk": {}` entry in it. This variable can hold the following value
   // ...
 ```
 
-Kronk uses a `package.json` to allow you to install libraries that you can use in
-javascript files in the `src` directory. FIXME : section about javascript files.
+Kronk uses a `package.json` for its configuration to allow you to install libraries that
+you can use in javascript files in the `src` directory. The configuration object contains only
+paths ; this is because the behaviour altering options are always defined in metadatas.
 
-Metadata
-=============
+When run, kronk will look up the package.json, read all the files in the `src` directory
+and render all those that do not start with `_` and that have either the `.md` or `.pug`
+extensions into the `build` directory.
+
+Note that *all* the files are read, even those that will not be rendered. This is so that
+those that will be can still access their metadata in their templates.
+
+To get a hang of kronk, try cloning the [sample project](https://github.com/ceymard/kronk-sample-site).
+
+# Metadata
 
 ## File Meta
 
@@ -48,8 +67,6 @@ In the case of json, the `{` and `}` surrounding the object are optional.
 
 In pug templates we can access this metadata directly as it is injected into the locals.
 
-Do not use the `kronk` key for you own data as it has a special meaning.
-
 ```jade
 ---
 // This is a yaml metadata section.
@@ -62,27 +79,50 @@ h1 Displaying the title : #{title}
 ```
 
 In addition to the metadata defined in this file and inherited via `__meta__` files,
-two variables are passed to the template : `$file` which is a `File` instance, and
-`$files` which is a `FileArray` instance.
+two variables are passed to the template : `$file` which is a [File](#File) instance, and
+`$files` which is a [FileArray](#FileArray) instance.
+
+## Pure meta files
+
+Sometimes, it is useful to define a file that is pure data and is not meant to be rendered.
+You can thus have
 
 
 ## Inheritance
 
 Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
-all the other files will merge its content into their own metadata.
+all the other files in the same directory will deep merge its content into their own metadata.
 
-Subdirectories inherit their parent's `__meta__` files.
-
-In the case that we have a `__meta__.js`, the metadata will be looked inside the `module.exports`
+In the case that we have a `__meta__.js` file, the metadata will be looked inside its `module.exports`
 variable.
 
+The metadata defined in a template file has precedence over the `__meta__` files.
+
+Subdirectories inherit their parent directory's `__meta__` files. It is thus possible to have
+a hierarchy of `__meta__` files that get enriched the further down the tree we go. When merging,
+children have priority over parents.
+
+For instance, in the following example, index.pug merges the `__meta__.json`'s contents into
+its own metadata and that's it.
+
+`file1.md` and `file2.md` however will have the contents of `__meta__.json` and `__meta__.yml` merged
+into their own metadata.
+
+```
+ .- __meta__.json
+ |- index.pug
+ |-. docs
+   |- __meta__.yml
+   |- file1.md
+   `- file2.md
+```
 
 # Javascript Files
 
 To allow for maximal flexibility, you can have plain javascript files in your `src/` directory.
 
 These files are not rendered like `.pug` or `.md` files ; instead, kronk expects their `module.exports`
-to be a function.
+to be a function and runs it at render time.
 
 ```javascript
 // Example of a javascript file that uses a template not normally rendered to
@@ -106,7 +146,7 @@ module.exports = function ($file, $files) {
 
 ```
 
-`.js` files can also be used as a `__meta__.js` entry, which will then use the `module.exports` to merge
+`.js` files can also be used as a `__meta__.js` entry, which will then use the `module.exports` as the meta object.
 
 # Markdown Handling
 
@@ -117,28 +157,61 @@ If you wish to override these defaults, use the `kronk.markdown_template` and `k
 
 # API
 
-## The Files Array
+<a name="FileArray"/>
+## FileArray
 
 When kronk is run, all the files of the `src` directory are added to a file array.
 This array is passed to all the templates so that a file may access other files
 metadata.
 
-It defines several methods to find and filter files ;
+### Methods
+
+* `get(name: string): File` Gets the file object of the same name. `null` if
+  the file does not exist. All files can be accessed this way, even the pure data ones.
+
+* `in(dir: string, shallow = false): FileArray` Filter the files to only include the files
+  in the specified directory and its children. If `shallow` is true, do not descend into
+  subdirectories.
+
+* `renderable(): FileArray` Only the renderable files
 
 
-## The File Object
+<a name="File"/>
+## File
 
+The file object holds informations about a file that has been read by kronk.
 
+### Methods
 
+* `renderable(): boolean` true if the file can be rendered (usually just because
+  it is markdown or pug)
+* `render(meta: object = {}): void` render the file to the file system, merging
+  the additionnal meta to the `file.meta`. This does not change `file.meta`.
 
+### Properties
+
+* `name: string` the name of the file with its path relative to `src/` but without extension
+* `basename: string` the basename of the file
+* `noextbasename: string` the basename without extension
+* `path: string` the absolute path of this file
+* `ext: string` the file extension
+* `dirname: string` the directory name relative to `src/`
+* `stat: StatObject` the stat as returned by `fs.stat()`
+
+* `contents: string` the original contents of the file without the metadata section
+
+* `meta: object` the parsed metadata with `__meta__` files already merged into it. *not enumerable*
+* `$files: FileArray` the FileArray this File belongs to. *not enumerable*
 
 ## Special metadata variables
 
-Here is the list of variables that kronk uses inside the file metadata ;
+Some metadata values are interpreted by kronk and not left only to your templates.
+They all live inside the `kronk` object to avoid clashing with your own naming.
 
-* `output_filename` use this variable to override the default file name that will
-   be assigned to the built file, which is by default `<$file.name>.html`. Useful when
-   rendering manually.
+* `kronk.output_filename` the name of the file that will be written in `build` when `render()`
+   is called on this file. *default* `<$file.name>.html`
 
 * `kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
-* `kronk.markdown_block` is the name of the block inside this template.
+   *default* `/markdown.pug`.
+
+* `kronk.markdown_block` is the name of the block inside the markdown template. *default* `'markdown'`

@@ -85,7 +85,7 @@ rr('.', function (err, results) {
   for (var f of files) {
 
     if (f.ext === '.js') {
-      require(f.full_name)(f, files, config)
+      require(f.path)(f, files, config)
     }
 
     if (!f.renderable() || f.basename[0] === '_') continue
