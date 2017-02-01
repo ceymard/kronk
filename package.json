@@ -1,8 +1,18 @@
 {
   "name": "kronk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "kronk": "./scripts/kronk.js"
+  },
+  "description": "A pretty simple static site generator",
+  "keywords": ["static", "web", "site", "generation", "generator"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ceymard/kronk.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ceymard/kronk/issues"
   },
   "dependencies": {
     "colors": "^1.1.2",
