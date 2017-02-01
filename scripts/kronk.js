@@ -43,14 +43,10 @@ while (process.cwd() !== '/') {
   process.chdir('..')
 }
 
-config.build_dir = config.build_dir || 'build'
-config.templates_dir = config.templates_dir || 'templates'
-config.src_dir = config.src_dir || 'src'
-config.project_dir = process.cwd()
-
-config.pug = config.pug || {}
-// used mostly for markdown
-config.pug.default_block = config.pug.default_block || 'content'
+config.build_dir = path.resolve(config.build_dir || 'build')
+config.templates_dir = path.resolve(config.templates_dir || 'templates')
+config.src_dir = path.resolve(config.src_dir || 'src')
+config.project_dir = path.resolve(process.cwd())
 
 process.chdir(config.src_dir)
 
@@ -91,14 +87,15 @@ rr('.', function (err, results) {
 
   for (var f of files) {
 
-    if (!f.renderable()) continue
+
+    if (f.ext === '.js') {
+      require(f.full_name)(f, files, config)
+    }
+
+    if (!f.renderable() || f.basename[0] === '_') continue
 
     try {
-      var rendered = f.render(config)
-      mkdirp.sync(path.join(build_dir, f.dirname))
-      fs.writeFileSync(path.join(build_dir, f.name + '.html'), rendered, {encoding: 'utf-8'})
-      var html_file = f.name + '.html'
-      console.log(`${N} ${c.green(html_file)}`)
+      f.render()
     } catch (e) {
       console.error(`${E} ${c.red(f.filename)} ${e.message}`)
       continue

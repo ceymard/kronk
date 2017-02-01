@@ -56,10 +56,13 @@ If you wish to override these defaults, use the `kronk.markdown_template` and `k
 Metadata Inheritance
 ====================
 
-Whenever a `__meta__.{json|json5|yaml|yml|toml}` file is defined in a directory,
+Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
 all the other files will merge its content into their own metadata.
 
 Subdirectories inherit their parent's `__meta__` files.
+
+In the case that we have a `__meta__.js`, the metadata will be looked inside the `module.exports`
+variable.
 
 
 Special metadata variables
