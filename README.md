@@ -51,15 +51,20 @@ In pug templates we can access this metadata directly as it is injected into the
 Do not use the `kronk` key for you own data as it has a special meaning.
 
 ```jade
-...
-// This is a json5 metadata section.
-title: 'my title'
-...
+---
+// This is a yaml metadata section.
+title: my title
+---
 
 h1 Displaying the title : #{title}
 
 
 ```
+
+In addition to the metadata defined in this file and inherited via `__meta__` files,
+two variables are passed to the template : `$file` which is a `File` instance, and
+`$files` which is a `FileArray` instance.
+
 
 ## Inheritance
 
@@ -112,6 +117,21 @@ If you wish to override these defaults, use the `kronk.markdown_template` and `k
 
 # API
 
+## The Files Array
+
+When kronk is run, all the files of the `src` directory are added to a file array.
+This array is passed to all the templates so that a file may access other files
+metadata.
+
+It defines several methods to find and filter files ;
+
+
+## The File Object
+
+
+
+
+
 ## Special metadata variables
 
 Here is the list of variables that kronk uses inside the file metadata ;
@@ -122,7 +142,3 @@ Here is the list of variables that kronk uses inside the file metadata ;
 
 * `kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
 * `kronk.markdown_block` is the name of the block inside this template.
-* `kronk.draft` if true, this file will not be generated
-
-* `$files` the array of all the files parsed inside the `src` directory
-* `$file` the current file
