@@ -150,8 +150,19 @@ module.exports = function ($file, $files) {
 
 # Markdown Handling
 
-Markdown is always injected in the end into a pug template, which is by default `/markdown.pug` into
-the `markdown` block by default.
+Markdown files are generated and injected into a pug template. By default, this template is ;
+
+```
+extends /markdown.pug
+
+block markdown
+  | ... the result of
+  | the generation of the markdown is put here.
+
+```
+
+This pug template uses the local metadata as well, which means that interpolation in your markdown
+is possible using the `#{variable}` syntax.
 
 If you wish to override these defaults, use the `kronk.markdown_template` and `kronk.markdown_block` file metadata variables.
 
