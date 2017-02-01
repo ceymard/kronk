@@ -97,16 +97,15 @@ two variables are passed to the template : `$file` which is a [File](#File) inst
 ## Pure meta files
 
 Sometimes, it is useful to define a file that is pure data and is not meant to be rendered.
-You can thus have
+Kronk reads files with extensions `json`, `json5`, `yaml`, `yml`, `toml` and `js`.
 
+Their content is parsed and put into the `file.meta` variable. In the case of `.js` files,
+they are `require()`'d and the resulting `module.exports` is put into `file.meta`.
 
 ## Inheritance
 
 Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
-all the other files in the same directory will deep merge its content into their own metadata.
-
-In the case that we have a `__meta__.js` file, the metadata will be looked inside its `module.exports`
-variable.
+all the other files in the same directory will deep merge their content into their own metadata.
 
 The metadata defined in a template file has precedence over the `__meta__` files.
 
@@ -188,8 +187,8 @@ a `__meta__.js` file including `highlight.js` or another highlighting library in
 ## FileArray
 
 When kronk is run, all the files of the `src` directory are added to a file array.
-This array is passed to all the templates so that a file may access other files
-metadata.
+This array is passed to all the templates as the `$file` variable so that a file
+may access other files and play with them.
 
 ### Methods
 
@@ -206,7 +205,8 @@ metadata.
 <a name="File"/>
 ## File
 
-The file object holds informations about a file that has been read by kronk.
+The file object holds informations about a file that has been read by kronk. This object
+is always injected into the template's metadata when rendering as `$file`.
 
 ### Methods
 
