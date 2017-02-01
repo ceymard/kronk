@@ -18,6 +18,20 @@ It uses the following great software :
 * [Toml](https://github.com/toml-lang/toml) because choice is good
 * [Yaml](http://yaml.org/) because even more choice is even better
 
+**Table of Contents**
+
+- [Getting Started](#start)
+- [Metadata](#metadata)
+  - [File Meta](#filemeta)
+  - [Pure Metadata Files](#puremeta)
+  - [Metadata Inheritance](#inheritance)
+- [Javascript Files](#javascript)
+- [Markdown Handling](#markdown)
+- [API](#api)
+  - [FileArray](#FileArray)
+  - [File](#File)
+  - [Kronk Metadata Object](#kronkobj)
+
 # TL;DR
 
 ```sh
@@ -27,6 +41,7 @@ $ cd kronk-sample-site
 $ kronk
 ```
 
+<a name="start"/>
 # Getting Started
 
 For kronk to build a site, it needs a `package.json` file at the root of the project with
@@ -55,6 +70,7 @@ those that will be can still access their metadata in their templates.
 
 To get a hang of kronk, try cloning the [sample project](https://github.com/ceymard/kronk-sample-site).
 
+<a name="metadata"/>
 # Metadata
 
 All files in kronk are associated to metadata. Some files are even pure metadata.
@@ -63,6 +79,7 @@ What you put in it is entirely up to you, as **we make no assumption what you sh
 The only exception is [the `kronk` object](#kronkobj), as its value can change the way
 kronk behaves.
 
+<a name="filemeta"/>
 ## File Meta
 
 Like hugo or jekyll, kronk allows you to define metadata in the very files that
@@ -90,7 +107,8 @@ In addition to the metadata defined in this file and inherited via `__meta__` fi
 two variables are passed to the template : `$file` which is a [File](#File) instance, and
 `$files` which is a [FileArray](#FileArray) instance.
 
-## Pure meta files
+<a name="puremeta"/>
+## Pure Metadata Files
 
 Sometimes, it is useful to define a file that is pure data and is not meant to be rendered.
 Kronk reads files with extensions `json`, `json5`, `yaml`, `yml`, `toml` and `js`.
@@ -98,7 +116,8 @@ Kronk reads files with extensions `json`, `json5`, `yaml`, `yml`, `toml` and `js
 Their content is parsed and put into the `file.meta` variable. In the case of `.js` files,
 they are `require()`'d and the resulting `module.exports` is put into `file.meta`.
 
-## Inheritance
+<a name="inheritance"/>
+## Metadata Inheritance
 
 Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
 all the other files in the same directory will deep merge their content into their own metadata.
@@ -124,6 +143,7 @@ into their own metadata.
    `- file2.md
 ```
 
+<a name="javascript"/>
 # Javascript Files
 
 To allow for maximal flexibility, you can have plain javascript files in your `src/` directory.
@@ -155,6 +175,7 @@ module.exports = function ($file, $files) {
 
 `.js` files can also be used as a `__meta__.js` entry, which will then use the `module.exports` as the meta object.
 
+<a name="markdown"/>
 # Markdown Handling
 
 Markdown files are generated and injected into a pug template. By default, this template is ;
@@ -177,6 +198,7 @@ Note that by default there is no code highlighting included ; you will have to u
 a `__meta__.js` file including `highlight.js` or another highlighting library into the
 `kronk.markdown_options` object.
 
+<a name="api">
 # API
 
 <a name="FileArray"/>
@@ -227,7 +249,7 @@ is always injected into the template's metadata when rendering as `$file`.
 * `$files: FileArray` the FileArray this File belongs to. *not enumerable*
 
 <a name="kronkobj"/>
-## Special metadata variables
+## Kronk Metadata Object
 
 Some metadata values are interpreted by kronk and not left only to your templates.
 They all live inside the `kronk` object to avoid clashing with your own naming.
