@@ -12,8 +12,6 @@ const toml = require('toml')
 const yaml = require('yamljs')
 const rr = require('recursive-readdir')
 
-// First, find the config file.
-var config = null
 
 const W = c.bold.yellow(' \u2717 ')
 const E = c.bold.red(' \u2717 ')
@@ -23,32 +21,33 @@ const _file = require('../lib/file')
 const FileArray = _file.FileArray
 const File = _file.File
 
+////////////////////////////////////////////////////////////////
+
+// First, find the config file.
+var config = null
+
 while (process.cwd() !== '/') {
 
-  var toml_path = path.join(process.cwd(), 'config.toml')
-  var yaml_path = path.join(process.cwd(), 'config.yml')
-  var json_path = path.join(process.cwd(), 'config.json')
-
-
-  if (fs.existsSync(toml_path)) {
-    config = toml.parse(fs.readFileSync(toml_path, 'utf-8'))
-    break
-  }
-
-  if (fs.existsSync(yaml_path)) {
-    config = yaml.load(yaml_path)
+  if (fs.existsSync('package.json')) {
+    config = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
     break
   }
 
   process.chdir('..')
 }
 
-config.build_dir = path.resolve(config.build_dir || 'build')
-config.templates_dir = path.resolve(config.templates_dir || 'templates')
-config.src_dir = path.resolve(config.src_dir || 'src')
-config.project_dir = path.resolve(process.cwd())
+if (!config || !config.kronk) {
+  console.error(`${E} there is no package.json or no "kronk" entry in the package.json`)
+  process.exit(1)
+}
 
-process.chdir(config.src_dir)
+config = config.kronk
+
+config.build = path.resolve(config.build || 'build')
+config.templates = path.resolve(config.templates || 'templates')
+config.src = path.resolve(config.src || 'src')
+
+process.chdir(config.src)
 
 rr('.', function (err, results) {
 
@@ -83,10 +82,7 @@ rr('.', function (err, results) {
 
   }
 
-  var build_dir = path.join(config.project_dir, config.build_dir)
-
   for (var f of files) {
-
 
     if (f.ext === '.js') {
       require(f.full_name)(f, files, config)

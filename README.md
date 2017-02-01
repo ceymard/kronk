@@ -17,6 +17,19 @@ toml, yaml and json5 for the metadata definition.
 Getting Started
 ===============
 
+For kronk to build a site, it needs a `package.json` file at the root of the project with
+at least a `"kronk": {}` entry in it. This variable can hold the following values ;
+
+```json
+  // ...
+  "kronk": {
+    "src": "<the directory containing the site sources, relative to the package.json>",
+    "template": "<the directory containing the pug templates, relative to the package.json>",
+    "build": "<the directory where the generated files will be placed>"
+  },
+  // ...
+```
+
 
 File Metadata
 =============
@@ -69,6 +82,10 @@ Special metadata variables
 ==========================
 
 Here is the list of variables that kronk uses inside the file metadata ;
+
+* `output_filename` use this variable to override the default file name that will
+   be assigned to the built file, which is by default `<$file.name>.html`. Useful when
+   rendering manually.
 
 * `kronk.markdown_template` is the name of the pug template in which a markdown file will be injected.
 * `kronk.markdown_block` is the name of the block inside this template.
