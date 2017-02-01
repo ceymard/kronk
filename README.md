@@ -100,6 +100,13 @@ title: my title
 
 h1 Displaying the title : #{title}
 
+p.
+  This file's name is "#{$file.name}". In its directory, there are probably
+  others. Here are their name :
+
+ul
+  each file in $files.in($file.dirname)
+    li ${file.name}
 
 ```
 
