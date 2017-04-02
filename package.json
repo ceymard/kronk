@@ -5,7 +5,13 @@
     "kronk": "./scripts/kronk.js"
   },
   "description": "A pretty simple static site generator",
-  "keywords": ["static", "web", "site", "generation", "generator"],
+  "keywords": [
+    "static",
+    "web",
+    "site",
+    "generation",
+    "generator"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/ceymard/kronk.git"
@@ -26,5 +32,13 @@
     "recursive-readdir": "^2.1.0",
     "toml": "^2.3.1",
     "yamljs": "^0.2.8"
+  },
+  "devDependencies": {
+    "@types/colors": "^1.1.2",
+    "@types/json5": "0.0.29",
+    "@types/markdown-it": "0.0.2",
+    "@types/minimist": "^1.2.0",
+    "@types/nunjucks": "0.0.32",
+    "@types/pug": "^2.0.4"
   }
 }
