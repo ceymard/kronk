@@ -2,7 +2,7 @@
   "name": "kronk",
   "version": "0.1.2",
   "bin": {
-    "kronk": "./scripts/kronk.js"
+    "kronk": "./build/cli.js"
   },
   "description": "A pretty simple static site generator",
   "keywords": [
@@ -26,11 +26,9 @@
     "expression-sandbox": "^1.1.0",
     "json5": "^0.5.1",
     "markdown-it": "^8.2.2",
-    "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "pug": "^2.0.0-beta10",
-    "recursive-readdir": "^2.1.0",
     "toml": "^2.3.1",
+    "tslib": "^1.6.0",
     "yamljs": "^0.2.8"
   },
   "devDependencies": {

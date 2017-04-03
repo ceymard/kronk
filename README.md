@@ -2,8 +2,9 @@
 
 * All files get into a big collection. Names are relative to source directory,
   and are a single string with the / character.
+* A file may contain a data preamble. Its contents can be transformed (through its render)
 * `data` applies to files whose name start with its basedir name, in alphanumerical
-  order.
+  order. A `data` file is a file whose name ends with `.data.*` or is `data.{json|json5|js|yml|yaml|toml}`
 * Javascript/Typescript files are run and must export an `init()` function which
   either take a callback or return a `Promise`. `data.{j,t}s` files must return
   data through the `init()` function.
