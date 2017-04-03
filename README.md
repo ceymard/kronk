@@ -1,3 +1,14 @@
+# Rewrite in progress
+
+* All files get into a big collection. Names are relative to source directory,
+  and are a single string with the / character.
+* `data` applies to files whose name start with its basedir name, in alphanumerical
+  order.
+* Javascript/Typescript files are run and must export an `init()` function which
+  either take a callback or return a `Promise`. `data.{j,t}s` files must return
+  data through the `init()` function.
+* Files whose name start with `_` are parsed but not rendered.
+
 # Kronk, a simple static website generator
 
 Kronk helps you create your static website, be it a blog or any other kind
@@ -42,6 +53,7 @@ $ kronk
 ```
 
 <a name="start"/>
+
 # Getting Started
 
 For kronk to build a site, it needs a `package.json` file at the root of the project with
@@ -71,6 +83,7 @@ those that will be can still access their metadata in their templates.
 To get a hang of kronk, try cloning the [sample project](https://github.com/ceymard/kronk-sample-site).
 
 <a name="metadata"/>
+
 # Metadata
 
 All files in kronk are associated to metadata. Some files are even pure metadata.
@@ -80,6 +93,7 @@ The only exception is [the `kronk` object](#kronkobj), as its value can change t
 kronk behaves.
 
 <a name="filemeta"/>
+
 ## File Meta
 
 Like hugo or jekyll, kronk allows you to define metadata in the very files that
@@ -115,6 +129,7 @@ two variables are passed to the template : `$file` which is a [File](#File) inst
 `$files` which is a [FileArray](#FileArray) instance.
 
 <a name="puremeta"/>
+
 ## Pure Metadata Files
 
 Sometimes, it is useful to define a file that is pure data and is not meant to be rendered.
@@ -124,6 +139,7 @@ Their content is parsed and put into the `file.meta` variable. In the case of `.
 they are `require()`'d and the resulting `module.exports` is put into `file.meta`.
 
 <a name="inheritance"/>
+
 ## Metadata Inheritance
 
 Whenever a `__meta__.{json|json5|yaml|yml|toml|js}` file is defined in a directory,
@@ -151,6 +167,7 @@ into their own metadata.
 ```
 
 <a name="javascript"/>
+
 # Javascript Files
 
 To allow for maximal flexibility, you can have plain javascript files in your `src/` directory.
@@ -183,6 +200,7 @@ module.exports = function ($file, $files) {
 `.js` files can also be used as a `__meta__.js` entry, which will then use the `module.exports` as the meta object.
 
 <a name="markdown"/>
+
 # Markdown Handling
 
 Markdown files are generated and injected into a pug template. By default, this template is ;
@@ -206,9 +224,11 @@ a `__meta__.js` file including `highlight.js` or another highlighting library in
 `kronk.markdown_options` object.
 
 <a name="api">
+
 # API
 
 <a name="FileArray"/>
+
 ## FileArray
 
 When kronk is run, all the files of the `src` directory are added to a file array.

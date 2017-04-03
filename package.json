@@ -38,6 +38,7 @@
     "@types/json5": "0.0.29",
     "@types/markdown-it": "0.0.2",
     "@types/minimist": "^1.2.0",
+    "@types/node": "^7.0.12",
     "@types/nunjucks": "0.0.32",
     "@types/pug": "^2.0.4"
   }
