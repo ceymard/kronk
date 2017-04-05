@@ -1,110 +1,48 @@
 
+import * as fs from 'mz/fs'
 import * as pth from 'path'
 
 import {Data} from './data'
 
 export abstract class File {
 
-  static registerExtension(...exts: string[]): void {
+  public ext: string
 
-  }
+  // The name of the file including its relative directory, without extension.
+  public name: string
 
-  base_data: Data = {kronk: {}}
+  public abspath: string
 
-  extension: string
-  abspath: string
-  name: string
-  basename: string
+  /**
+   * Most of the time, files have their own data.
+   */
+  public own_data: Data
 
-  is_renderable: boolean = false
+  /**
+   * The contents once decoded. Can stay null if the file is pure data
+   * or javascript.
+   */
+  public original_contents: string | null = null
+  public contents: string | null
 
-  constructor(
-    public path: string,
-    public basedir: string,
-    public contents: string
-  ) {
-    var parsed = pth.parse(path)
-    this.extension = parsed.ext
-    this.basename = parsed.base
+  constructor(public basedir: string, public path: string, public full_contents: string, public base_data: Data) {
+    var p = pth.parse(path)
+    this.ext = p.ext
+    this.name = pth.join(p.dir, p.base)
     this.abspath = pth.join(basedir, path)
-    this.name = pth.join(parsed.dir, parsed.name)
-  }
-
-  /**
-   * Fill
-   */
-  abstract parse(contents: string): void
-
-  /**
-   * Render the file to its final location.
-   * @param data the data to be merged into this file's
-   *    own data.
-   * @returns The generated content
-   */
-  abstract render(data: Data): string
-
-}
-
-
-/**
- *
- */
-export class MetaFile extends File {
-
-  isRenderable() { return false }
-
-  parse(contents: string) {
-
-  }
-
-  render(data: Data) { return '' }
-
-}
-
-import * as j5 from 'json5'
-
-export class DataFile extends MetaFile {
-  parse(contents: string) {
-    // Add the { } necessary to JSON contents
-    if (!/[\s]*/m.test(contents)) {
-      contents = `{${contents}}`
-    }
-    this.base_data = j5.parse(contents)
-  }
-}
-
-DataFile.registerExtension('json', 'json5')
-
-export class YamlFile extends MetaFile {
-  parse(contents: string) {
-
-  }
-}
-
-YamlFile.registerExtension('yaml', 'yml')
-
-export class TomlFile extends MetaFile {
-
-}
-
-TomlFile.registerExtension('toml', 'tml')
-
-
-import * as nun from 'nunjucks'
-
-
-export class NunjucksFile extends File {
-
-  parse(contents: string) {
-    nun.precompileString(contents, {
-
-    })
-  }
-
-  render(data: Data) {
-    return ''
   }
 
 }
 
-NunjucksFile.registerExtension('nks')
+export abstract class Handler {
+
+  static register(ext: string) {
+    // ???
+  }
+
+  constructor(public file: File) {
+
+  }
+
+  abstract async handle(): Promise<any>
+}
