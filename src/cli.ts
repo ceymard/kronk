@@ -3,10 +3,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import {Project} from './project'
 
 export interface PackageJson {
   kronk: {
-
+    src: string
   }
 }
 
@@ -20,7 +21,9 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
     var pth = path.join(current_dir, 'package.json')
 
     if (fs.existsSync(pth)) {
-      return JSON.parse(fs.readFileSync(pth, 'utf-8'))
+      var res = JSON.parse(fs.readFileSync(pth, 'utf-8'))
+      res.kronk.src = res.kronk.src || 'src'
+      return res
     } else {
       current_dir = path.dirname(current_dir)
     }
@@ -41,10 +44,11 @@ export class Kronk {
 
 export const kronk = new Kronk()
 
+
 /// 1. Look for the package.json
+var pkg = getPackageJson()
 
 /// 2. Extract basic informations to create the Project
-
-/// 3. Load plugins from this information (mostly file handlers)
+var p = new Project(pkg.kronk.src)
 
 /// 3. Watch or run once, which ever comes first

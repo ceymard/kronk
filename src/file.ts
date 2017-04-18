@@ -4,7 +4,7 @@ import * as pth from 'path'
 
 import {Data} from './data'
 
-export abstract class File {
+export class File {
 
   public ext: string
 
@@ -17,6 +17,7 @@ export abstract class File {
    * Most of the time, files have their own data.
    */
   public own_data: Data
+  public data: Data
 
   /**
    * The contents once decoded. Can stay null if the file is pure data
@@ -25,7 +26,13 @@ export abstract class File {
   public original_contents: string | null = null
   public contents: string | null
 
-  constructor(public basedir: string, public path: string, public full_contents: string, public base_data: Data) {
+  static async from(basedir: string, path: string): Promise<File> {
+    var contents = await fs.readFile(pth.join(basedir, path), {encoding: 'utf-8'})
+    var file = new File(basedir, path, contents)
+    return file
+  }
+
+  constructor(public basedir: string, public path: string, public full_contents: string) {
     var p = pth.parse(path)
     this.ext = p.ext
     this.name = pth.join(p.dir, p.base)
@@ -36,9 +43,26 @@ export abstract class File {
 
 export abstract class Handler {
 
-  static register(ext: string) {
-    // ???
+  static handlers: {[ext: string]: (new () => Handler)[] | undefined} = {}
+
+  static register<T extends Handler>(this: new () => T, ext: string) {
+    var handlers = Handler.handlers[ext]
+
+    if (!handlers) {
+      Handler.handlers[ext] = handlers = []
+    }
+
+    handlers.push(this)
   }
+
+  static handleFile(file: File) {
+    if (!Handler.handlers[file.ext])
+      throw new Error(`no handlers for ${file.name}`)
+  }
+
+  //////////////////////////////////////////////
+
+  require: (new() => Handler)[]
 
   constructor(public file: File) {
 
