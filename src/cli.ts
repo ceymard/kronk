@@ -22,7 +22,7 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
 
     if (fs.existsSync(pth)) {
       var res = JSON.parse(fs.readFileSync(pth, 'utf-8'))
-      res.kronk.src = res.kronk.src || 'src'
+      res.kronk.src = path.join(path.dirname(pth), res.kronk.src || 'src')
       return res
     } else {
       current_dir = path.dirname(current_dir)
@@ -33,22 +33,12 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
   throw new Error('could not find package.json')
 }
 
-
-export class Kronk {
-
-  registerExtension(ext: string) {
-
-  }
-
-}
-
-export const kronk = new Kronk()
-
-
 /// 1. Look for the package.json
 var pkg = getPackageJson()
 
 /// 2. Extract basic informations to create the Project
 var p = new Project(pkg.kronk.src)
+
+p.init()
 
 /// 3. Watch or run once, which ever comes first

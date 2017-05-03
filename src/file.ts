@@ -4,7 +4,13 @@ import * as pth from 'path'
 
 import {Data} from './data'
 
+export interface Handler {
+  new (...a: any[]): File
+}
+
 export class File {
+
+  public static handlers: {[ext: string]: Handler} = {}
 
   public ext: string
 
@@ -24,12 +30,16 @@ export class File {
    * or javascript.
    */
   public original_contents: string | null = null
+
   public contents: string | null
 
   static async from(basedir: string, path: string): Promise<File> {
     var contents = await fs.readFile(pth.join(basedir, path), {encoding: 'utf-8'})
-    var file = new File(basedir, path, contents)
-    return file
+    var ext = pth.extname(path).slice(1) // extension without the dotted part.
+    if (this.handlers[ext]) {
+      return new this.handlers[ext](basedir, path, contents)
+    }
+    return new File(basedir, path, contents)
   }
 
   constructor(public basedir: string, public path: string, public full_contents: string) {
@@ -39,34 +49,25 @@ export class File {
     this.abspath = pth.join(basedir, path)
   }
 
+  async readFile() {
+    // Read the contents of the file
+    this.full_contents = await fs.readFile(this.abspath, {encoding: 'utf-8'})
+  }
+
+  /**
+   * Extract data from the file
+   */
+  async extractData() {
+    // Not implemented by default.
+  }
+
+  /**
+   * Handle the file and generate its contents (or any other contents)
+   */
+  async handle() {
+
+  }
+
 }
 
-export abstract class Handler {
-
-  static handlers: {[ext: string]: (new () => Handler)[] | undefined} = {}
-
-  static register<T extends Handler>(this: new () => T, ext: string) {
-    var handlers = Handler.handlers[ext]
-
-    if (!handlers) {
-      Handler.handlers[ext] = handlers = []
-    }
-
-    handlers.push(this)
-  }
-
-  static handleFile(file: File) {
-    if (!Handler.handlers[file.ext])
-      throw new Error(`no handlers for ${file.name}`)
-  }
-
-  //////////////////////////////////////////////
-
-  require: (new() => Handler)[]
-
-  constructor(public file: File) {
-
-  }
-
-  abstract async handle(): Promise<any>
-}
+import './handlers'

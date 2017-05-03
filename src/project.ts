@@ -10,7 +10,10 @@ import {File} from './file'
 export class Project {
 
   constructor(public basedir: string) {
-    this.readDir('')
+  }
+
+  async init() {
+    await this.readDir('')
   }
 
   async readDir(dir: string) {
@@ -32,8 +35,7 @@ export class Project {
 
   async addFile(pth: string) {
     var f = await File.from(this.basedir, pth)
-    console.log(path.join(this.basedir, pth))
-    console.log(f.full_contents.length)
+    console.log(pth, f.constructor.name, f.full_contents.length)
   }
 
   rebuild(changed_files: string[] = []) {
