@@ -70,4 +70,10 @@ export class File {
 
 }
 
+
+export class PureDataFile extends File {
+
+}
+
+
 import './handlers'
