@@ -1,27 +1,32 @@
 
-import * as pug from 'pug'
 import * as nun from 'nunjucks'
 
 export interface Data {
 
   kronk: {
-    markdown_template?: string
-    markdown_block?: string
-    pug?: pug.Options,
-    nunjucks?: nun.ConfigureOptions
+    draft?: boolean
+    render?: boolean
+    markdown?: {
+      template?: string
+      block?: string
+    }
+    nunjucks?: {
+      options?: nun.ConfigureOptions
+    }
   }
 
 }
 
 export const DEFAULTS: Data = {
   kronk: {
-    markdown_template: 'markdown',
-    markdown_block: 'markdown',
-    pug: {
-
+    render: true,
+    draft: false,
+    markdown: {
+      template: 'markdown',
+      block: 'markdown',
     },
     nunjucks: {
-
+      options: {}
     }
   }
 }

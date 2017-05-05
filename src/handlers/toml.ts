@@ -1,10 +1,14 @@
 
 import {File} from '../file'
 
+import * as t from 'toml'
 
-export class TomlFile extends File {
 
+export async function parseToml(file: File) {
+  if (!file.is('toml', 'tml')) return
+
+  file.data = t.parse(file.original_contents)
+  file.contents = ''
 }
 
-File.handlers['toml'] = TomlFile
-File.handlers['tml'] = TomlFile
+File.parsers.push(parseToml)

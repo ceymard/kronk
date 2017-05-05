@@ -39,6 +39,19 @@ var pkg = getPackageJson()
 /// 2. Extract basic informations to create the Project
 var p = new Project(pkg.kronk.src)
 
-p.init()
 
-/// 3. Watch or run once, which ever comes first
+async function run() {
+  try {
+    await p.init()
+    // p.showTree()
+    await p.rebuild()
+  } catch (e) {
+    console.error(e.stack)
+  }
+}
+
+process.on('unhandledRejection', (reason: Error) => {
+  console.error(reason);
+});
+
+run()

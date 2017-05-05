@@ -1,8 +1,8 @@
 
 import {File} from '../file'
 
-export class MarkdownFile extends File {
+export async function parseMarkdown(file: File) {
 
 }
 
-File.handlers['md'] = MarkdownFile
+File.parsers.push(parseMarkdown)
