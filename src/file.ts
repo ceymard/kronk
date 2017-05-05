@@ -145,6 +145,13 @@ export class File {
     }
   }
 
+  /**
+   * Once the file has been rendered, write its output into the destination.
+   */
+  async write() {
+
+  }
+
 }
 
 
