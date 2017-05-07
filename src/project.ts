@@ -13,7 +13,7 @@ export class Project {
   files_by_name: {[name: string]: File} = {}
   root = new File(this.basedir, '__root__', this)
 
-  constructor(public basedir: string) {
+  constructor(public basedir: string, public dir_build: string) {
     this.root.data = DEFAULTS
   }
 

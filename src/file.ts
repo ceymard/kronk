@@ -2,6 +2,7 @@
 import * as fs from 'mz/fs'
 import * as pth from 'path'
 import * as deep from 'deep-extend'
+import * as mk from 'mkdirp2'
 
 import {Data} from './data'
 import {Project} from './project'
@@ -134,10 +135,13 @@ export class File {
         for (var renderer of File.renderers) {
           await renderer(this, complete_data)
         }
-        console.log(`* rendered ${this.name}`)
       } catch (e) {
         console.error(`!! ${this.name} - ${e.message}`)
       }
+    }
+
+    if (this.rendered != null) {
+      this.write(complete_data)
     }
 
     for (var c of this.children) {
@@ -148,8 +152,18 @@ export class File {
   /**
    * Once the file has been rendered, write its output into the destination.
    */
-  async write() {
+  async write(data: Data) {
+    // get the rendered portion
+    // FIXME this should change !!
+    var output = pth.join(
+      this.project.dir_build,
+      data.kronk.output_name || this.name.replace(/(md|nks)$/, 'html')
+    )
 
+    var dirname = pth.dirname(output)
+    await mk.promise(dirname)
+    await fs.writeFile(output, this.rendered!)
+    console.log(output)
   }
 
 }

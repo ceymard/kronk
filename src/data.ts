@@ -12,7 +12,8 @@ export interface Data {
     }
     nunjucks?: {
       options?: nun.ConfigureOptions
-    }
+    },
+    output_name?: string
   }
 
 }

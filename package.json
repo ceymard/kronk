@@ -27,6 +27,7 @@
     "expression-sandbox": "^1.1.0",
     "markdown-it": "^8.2.2",
     "mkdirp": "^0.5.1",
+    "mkdirp2": "^1.0.2",
     "mz": "^2.6.0",
     "node-eval": "^1.1.0",
     "nunjucks": "^3.0.0",

@@ -7,7 +7,8 @@ import {Project} from './project'
 
 export interface PackageJson {
   kronk: {
-    src: string
+    src: string,
+    build: string
   }
 }
 
@@ -23,6 +24,7 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
     if (fs.existsSync(pth)) {
       var res = JSON.parse(fs.readFileSync(pth, 'utf-8'))
       res.kronk.src = path.join(path.dirname(pth), res.kronk.src || 'src')
+      res.kronk.build = path.join(path.dirname(pth), res.kronk.build || 'build')
       return res
     } else {
       current_dir = path.dirname(current_dir)
@@ -37,7 +39,7 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
 var pkg = getPackageJson()
 
 /// 2. Extract basic informations to create the Project
-var p = new Project(pkg.kronk.src)
+var p = new Project(pkg.kronk.src, pkg.kronk.build)
 
 
 async function run() {
