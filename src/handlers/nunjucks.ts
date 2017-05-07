@@ -6,7 +6,7 @@ import {Project} from '../project'
 
 import * as nj from 'nunjucks'
 
-var re_nks_data = /^(?:\s|\n)*\{#(((?!#\}).|\n)*)#\}(\n|\s)*/mi
+var re_nks_data = /^(?:\s|\n)*\{#-?(((?!#\}).|\n)*)-?#\}(\n|\s)*/mi
 
 var KronkLoader = nj.Loader.extend({
 
