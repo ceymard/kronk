@@ -27,7 +27,7 @@ export class File {
   /**
    * Most of the time, files have their own data.
    */
-  public data: Data
+  public data: Data = {} as any
   /**
    * This is filled by the project once all the files have been read
    * and is used to track which files will receive this file's data.

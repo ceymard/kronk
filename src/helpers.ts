@@ -1,4 +1,5 @@
 
+import * as toml from 'toml'
 
 export class Prom<T> {
 
@@ -16,5 +17,13 @@ export class Prom<T> {
       }
       this.accept(res)
     }
+  }
+}
+
+export function parseData(str: string): any {
+  try {
+    return toml.parse(str)
+  } catch (e) {
+    return null
   }
 }

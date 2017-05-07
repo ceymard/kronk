@@ -1,10 +1,9 @@
 
 import {File} from '../file'
 import {Data} from '../data'
-import {Prom} from '../helpers'
+import {Prom, parseData} from '../helpers'
 import {Project} from '../project'
 
-import * as toml from 'toml'
 import * as nj from 'nunjucks'
 
 var re_nks_data = /^(?:\s|\n)*\{#(((?!#\}).|\n)*)#\}(\n|\s)*/mi
@@ -40,9 +39,9 @@ export async function nunjucksParser(file: File) {
   var ct = file.original_contents
   var match = re_nks_data.exec(ct)
 
-  if (match) {
+  if (match && match.index === 0) {
     file.contents = ct.replace(match[0], '')
-    file.data = toml.parse(match[1])
+    file.data = parseData(match[1])
   } else {
     file.contents = ct
   }
@@ -60,7 +59,7 @@ async function nunjucksRenderer(file: File, data: Data) {
   var env = new nj.Environment(new KronkLoader(file.project))
   var p = new Prom<string>()
 
-  env.renderString(file.contents, file.data, p.callback())
+  env.renderString(file.contents, data, p.callback())
   file.rendered = await p.promise
 
 }
