@@ -6,6 +6,7 @@ export interface Data {
   kronk: {
     draft?: boolean
     render?: boolean
+    ignore_dir?: boolean
     markdown?: {
       template?: string
       block?: string
@@ -22,6 +23,7 @@ export const DEFAULTS: Data = {
   kronk: {
     render: true,
     draft: false,
+    ignore_dir: false,
     markdown: {
       template: 'markdown',
       block: 'markdown',

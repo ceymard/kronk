@@ -8,7 +8,7 @@ import * as nj from 'nunjucks'
 
 var re_nks_data = /^(?:\s|\n)*\{#-?(((?!#\}).|\n)*)-?#\}(\n|\s)*/mi
 
-var KronkLoader = nj.Loader.extend({
+var KronkLoader: any = nj.Loader.extend({
 
   async: true,
 
