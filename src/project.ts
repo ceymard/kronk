@@ -113,6 +113,7 @@ export class Project {
   update(pth: string) {
     var f = this.getFile(pth)
     if (f) {
+      f.parsed = null
       console.log(` * ${f.name} changed`)
       f.render()
 

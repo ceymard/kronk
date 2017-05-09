@@ -4,20 +4,24 @@ import * as toml from 'toml'
 export class Prom<T> {
 
   promise = new Promise<T>((ac, rj) => {
-    this.accept = ac
+    this.resolve = ac
     this.reject = rj
   })
-  accept: (v: T) => any
+  resolve: (v: T) => any
   reject: (a: any) => any
+
+  constructor(public node_like: boolean = true) { }
 
   callback() {
     return (err: any, res: T) => {
+      if (!this.node_like) return this.resolve(err)
       if (err) {
         return this.reject(err)
       }
-      this.accept(res)
+      this.resolve(res)
     }
   }
+
 }
 
 export function parseData(str: string): any {

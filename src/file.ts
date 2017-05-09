@@ -4,6 +4,7 @@ import * as pth from 'path'
 import * as deep from 'deep-extend'
 import * as mk from 'mkdirp2'
 
+import {Prom} from './helpers'
 import {Data, DEFAULTS} from './data'
 import {Project} from './project'
 
@@ -17,7 +18,6 @@ export class File {
   public static parsers: Parser[] = []
   public static renderers: Renderer[] = []
 
-  public parsed = false
   public ext: string
   // The name of the file including its relative directory, without extension.
   public name: string
@@ -33,6 +33,8 @@ export class File {
 
   public contents: string
   public rendered: string | null = null
+
+  public parsed: Prom<boolean> | null = null
 
   /**
    * The contents once decoded. Can stay null if the file is pure data
@@ -88,6 +90,10 @@ export class File {
    * @param data The data defined in files above us.
    */
   async parse() {
+
+    if (this.parsed !== null) return this.parsed
+    this.parsed = new Prom<boolean>()
+
     // We reset the string contents. For all we know, the file may have changed
     // on the disk.
     this._string_contents = null
@@ -97,7 +103,8 @@ export class File {
       await parser(this)
     }
 
-    this.parsed = true
+    this.parsed.resolve(true)
+    return this.parsed
   }
 
   async getData(): Promise<Data> {
@@ -106,7 +113,7 @@ export class File {
     for (var f of this.project.data_files) {
 
       if (pth.relative(f.dir, this.dir).indexOf('..') !== 0) {
-        if (!f.parsed) await f.parse()
+        await f.parse()
         data = deep(data, f.own_data)
         this.project.deps.add(f, this)
       }
@@ -124,7 +131,6 @@ export class File {
   async render() {
     // console.log(`---> ${this.name}`)
     var data = await this.getData()
-
 
     if (this.isRenderable(data) && data.kronk.render) {
       await this.parse()
@@ -146,11 +152,6 @@ export class File {
       this.write(data)
     }
 
-  }
-
-  change() {
-    this.parsed = false
-    this.own_data = {} as Data
   }
 
   /**
