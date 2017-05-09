@@ -168,7 +168,7 @@ export class File {
     var dirname = pth.dirname(output)
     await mk.promise(dirname)
     await fs.writeFile(output, this.rendered!)
-    console.log('=>', output.replace(this.project.dir_build + '/', ''))
+    console.log(' >', output.replace(this.project.dir_build + '/', ''))
   }
 
 }

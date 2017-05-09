@@ -6,7 +6,7 @@ import {Project} from '../project'
 
 import * as nj from 'nunjucks'
 
-var re_nks_data = /^(?:\s|\n)*\{#-?(((?!#\}).|\n)*)-?#\}(\n|\s)*/mi
+var re_nks_data = /^(?:\s|\r|\n)*\{#-?(((?!#\}).|\r|\n)*)-?#\}(\n|\r|\s)*/mi
 
 
 export class KronkLoader extends nj.Loader {
@@ -16,9 +16,9 @@ export class KronkLoader extends nj.Loader {
     super()
   }
 
-  async getSource(name: string, done: (err: any, res: any) => any) {
+  async getSource(name: string, done: (err: any, res?: any) => any) {
     var file = this.project.files_by_name[name + '.nks']
-    if (!file) throw new Error(`nunjucks: can't extend ${name}`)
+    if (!file) return done(new Error(`nunjucks: can't extend ${name}`))
 
     this.project.deps.add(file, this.file)
 
@@ -53,16 +53,32 @@ export async function nunjucksParser(file: File) {
 File.parsers.push(nunjucksParser)
 
 
+export function renderNunjucks(file: File, data: Data) {
+  var env = new nj.Environment(new KronkLoader(file.project, file) as any)
+  var p = new Prom<string>()
+
+  var contents = file.contents
+
+  if (data.kronk.nunjucks.block) {
+    contents = `{% block ${data.kronk.nunjucks.block} -%}
+${contents}
+{%- endblock %}`
+  }
+
+  if (data.kronk.nunjucks.extends) {
+    contents = `{% extends '${data.kronk.nunjucks.extends}' %}\n${contents}`
+  }
+
+  env.renderString(contents, data, p.callback())
+  return p.promise
+}
+
 async function nunjucksRenderer(file: File, data: Data) {
 
   // Fixme: check for kronk.nunjuck
   if (!file.is('nks')) return
 
-  var env = new nj.Environment(new KronkLoader(file.project, file) as any)
-  var p = new Prom<string>()
-
-  env.renderString(file.contents, data, p.callback())
-  file.rendered = await p.promise
+  file.rendered = await renderNunjucks(file, data)
 
 }
 

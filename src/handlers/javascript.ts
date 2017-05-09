@@ -2,9 +2,12 @@
 import {File} from '../file'
 import * as tsapi from 'typescript.api'
 import {Prom} from '../helpers'
+import {Data} from '../data'
 
 import * as ne from 'node-eval'
 
+
+var exports_symbol = Symbol('exports')
 
 /**
  * Require a javascript file and set this file's data as its
@@ -34,20 +37,31 @@ export async function javascriptParser(file: File) {
   // file.own_data.kronk.render = false
 
   // Maybe we should give a context here ?
-  var module = {exports: {}}
-  var exports = module.exports
-  ne(contents, file.abspath, {console, module, exports})
-  console.log(module)
+  var module = {exports: {} as any}
+  ne(contents, file.abspath, {console, module, exports: module.exports})
 
-  // Or should
+  var fileany = file as any
+  var exports = module.exports
+  // back up the exports into a non-enumerable symbol property.
+  fileany[exports_symbol] = exports
+
+  if (typeof exports.data === 'function') {
+    file.own_data = await exports.data()
+  }
 }
 
 File.parsers.push(javascriptParser)
 
 
-export async function javascriptHandler(file: File) {
+export async function javascriptHandler(file: File, data: Data) {
 
-  if (!file.is('js')) return
+  if (!file.is('js', 'ts')) return
 
-  // await file.own_data.handle(file)
+  var fileeany = file as any
+  var exports = fileeany[exports_symbol] || {} as any
+
+  if (typeof exports.render === 'function') {
+    await exports.render(data)
+  }
+1  // await file.own_data.handle(file)
 }

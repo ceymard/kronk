@@ -35,7 +35,6 @@ export class Deps {
 
   remove(file: File) {
     for (var f of this.depends_on.get(file) || []) {
-      console.log(`depended on ${f.name}`)
       var set = this.depended_by.get(f)
       if (!set) {
         continue

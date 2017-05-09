@@ -3,6 +3,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chokidar from 'chokidar'
+import * as m from 'minimist'
 
 import {Project} from './project'
 
@@ -50,8 +51,11 @@ process.on('unhandledRejection', (reason: Error) => {
 
 var initing = true
 
+
+var args = m(process.argv.slice(2))
+
 const watcher = chokidar.watch(pkg.kronk.src, {
-  persistent: true
+  persistent: args.w ? true : false
 })
 
 watcher.on('change', (path: string) => {

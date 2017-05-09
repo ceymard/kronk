@@ -7,12 +7,12 @@ export interface Data {
     draft?: boolean
     render?: boolean
     ignore_dir?: boolean
-    markdown?: {
-      template?: string
-      block?: string
+    markdown: {
     }
-    nunjucks?: {
-      options?: nun.ConfigureOptions
+    nunjucks: {
+      options: nun.ConfigureOptions
+      extends?: string
+      block?: string
     },
     output_name?: string
   }
@@ -25,8 +25,6 @@ export const DEFAULTS: Data = {
     draft: false,
     ignore_dir: false,
     markdown: {
-      template: 'markdown',
-      block: 'markdown',
     },
     nunjucks: {
       options: {}
