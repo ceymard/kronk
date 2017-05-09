@@ -1,8 +1,11 @@
 {
   "name": "kronk",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "bin": {
     "kronk": "./build/cli.js"
+  },
+  "scripts": {
+    "prepublish": "tsc"
   },
   "description": "A pretty simple static site generator",
   "keywords": [
