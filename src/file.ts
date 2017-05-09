@@ -4,7 +4,7 @@ import * as pth from 'path'
 import * as deep from 'deep-extend'
 import * as mk from 'mkdirp2'
 
-import {Data} from './data'
+import {Data, DEFAULTS} from './data'
 import {Project} from './project'
 
 
@@ -17,6 +17,7 @@ export class File {
   public static parsers: Parser[] = []
   public static renderers: Renderer[] = []
 
+  public parsed = false
   public ext: string
   // The name of the file including its relative directory, without extension.
   public name: string
@@ -27,16 +28,11 @@ export class File {
   /**
    * Most of the time, files have their own data.
    */
-  public data: Data = {} as any
-  /**
-   * This is filled by the project once all the files have been read
-   * and is used to track which files will receive this file's data.
-   */
-  public children: File[] = []
+  public own_data: Data = {} as any
+  public data: Data | null = null
 
   public contents: string
   public rendered: string | null = null
-
 
   /**
    * The contents once decoded. Can stay null if the file is pure data
@@ -61,27 +57,9 @@ export class File {
     var p = pth.parse(path)
     this.ext = p.ext.slice(1)
     this.basename = p.base.replace(/\..*?$/, '')
-    this.name = this.basename === '__data__' ? p.dir : pth.join(p.dir, p.base)
+    this.name = pth.join(p.dir, p.base)
     this.dir = p.dir
     this.abspath = pth.join(basedir, path)
-  }
-
-  isChild(file: File) {
-    if (this.name.indexOf(file.name) === 0) return true
-    return false
-  }
-
-  addChild(file: File) {
-    // The file should be appended to a child if it is a descendent of it.
-    for (var c of this.children) {
-      if (file.isChild(c)) {
-        c.addChild(file)
-        return
-      }
-    }
-
-    this.children.push(file)
-    this.children.sort((a, b) => a.name > b.name ? 1 : a.name < b.name ? -1 : 0)
   }
 
   /**
@@ -119,6 +97,23 @@ export class File {
       await parser(this)
     }
 
+    this.parsed = true
+  }
+
+  async getData(): Promise<Data> {
+    var data = deep({}, DEFAULTS)
+
+    for (var f of this.project.data_files) {
+
+      if (pth.relative(f.dir, this.dir).indexOf('..') !== 0) {
+        if (!f.parsed) await f.parse()
+        data = deep(data, f.own_data)
+        this.project.deps.add(this, f)
+      }
+
+    }
+
+    return data
   }
 
   /**
@@ -126,14 +121,21 @@ export class File {
    * has merged it into its respective files. It is thus possible
    * to use File#data in the rendering engines.
    */
-  async render(data: Data) {
-    await this.parse()
-    var complete_data = deep({}, data, this.data)
+  async render() {
+    // console.log(`---> ${this.name}`)
+    var data = await this.getData()
 
-    if (this.isRenderable(complete_data)) {
+
+    if (this.isRenderable(data) && data.kronk.render) {
+      await this.parse()
+      data = deep(data, this.own_data)
+
+      // No rendering of this file after parsing.
+      if (!data.kronk.render) return
+
       try {
         for (var renderer of File.renderers) {
-          await renderer(this, complete_data)
+          await renderer(this, data)
         }
       } catch (e) {
         console.error(`!! ${this.name} - ${e.message}`)
@@ -141,12 +143,14 @@ export class File {
     }
 
     if (this.rendered != null) {
-      this.write(complete_data)
+      this.write(data)
     }
 
-    for (var c of this.children) {
-      c.render(complete_data)
-    }
+  }
+
+  change() {
+    this.parsed = false
+    this.own_data = {} as Data
   }
 
   /**
@@ -163,7 +167,7 @@ export class File {
     var dirname = pth.dirname(output)
     await mk.promise(dirname)
     await fs.writeFile(output, this.rendered!)
-    console.log(output)
+    console.log('=>', output.replace(this.project.dir_build + '/', ''))
   }
 
 }
@@ -174,6 +178,5 @@ export interface Handler {
   handle(file: File): Promise<any>
 
 }
-
 
 import './handlers'

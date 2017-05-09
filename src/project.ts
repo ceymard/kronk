@@ -3,20 +3,62 @@ import * as path from 'path'
 import * as fs from 'mz/fs'
 
 import {File} from './file'
-import {DEFAULTS, Data} from './data'
+
+
+export class Deps {
+  // List of all the files that depend on this one.
+  depends_on = new WeakMap<File, Set<File>>()
+  // For a given file, lists all the files it depends on
+  depended_by = new WeakMap<File, Set<File>>()
+
+  add(by: File, on: File) {
+    var set = this.depends_on.get(on)
+    if (!set) {
+      set = new Set<File>()
+      this.depends_on.set(on, set)
+    }
+    set.add(by)
+
+    set = this.depended_by.get(by)
+    if (!set) {
+      set = new Set<File>()
+      this.depended_by.set(by, set)
+    }
+    set.add(on)
+  }
+
+  get(on: File): File[] {
+    var set = this.depends_on.get(on)
+    if (!set) return []
+    return [...set]
+  }
+
+  remove(file: File) {
+    for (var f of this.depends_on.get(file) || []) {
+      var set = this.depended_by.get(f)
+      if (!set) continue
+      set.delete(f)
+    }
+  }
+}
+
 
 /**
  * The project contains all the files
  */
 export class Project {
 
+  data_files = new Set<File>()
+  files = new Set<File>()
+
   files_by_name: {[name: string]: File} = {}
-  root = new File(this.basedir, '__root__', this)
+  deps = new Deps()
 
-  constructor(public basedir: string, public dir_build: string) {
-    this.root.data = DEFAULTS
-  }
+  constructor(public basedir: string, public dir_build: string) { }
 
+  /**
+   * Populate the files.
+   */
   async init() {
     await this.readDir('')
   }
@@ -40,34 +82,40 @@ export class Project {
 
   }
 
-  update(pth: string) {
-    var p = pth.replace(this.basedir, '')
-    var f = this.files_by_name[p]
-    if (f) {
-      f.render({} as Data)
-    }
-  }
-
   addFile(pth: string) {
     var f = File.from(this.basedir, pth, this)
     this.files_by_name[pth] = f
-    this.root.addChild(f)
+    if (f.basename === '__data__')
+      this.data_files.add(f)
+    else
+      this.files.add(f)
   }
 
   removeFile(pth: string) {
 
   }
 
-  rebuild(changed_files: string[] = []) {
-    this.root.render({} as Data)
+  update(pth: string) {
+    var p = pth.replace(this.basedir + '/', '')
+    var f = this.files_by_name[p]
+    if (f) {
+      f.render()
+
+      for (var f2 of this.deps.get(f)) {
+        f2.render()
+      }
+    }
   }
 
-  showTree(file = this.root, indent = 0) {
-    for (var i = 0; i < indent; i++) process.stdout.write(' ')
-    console.log(file.name)
-    for (var c of file.children) {
-      this.showTree(c, indent + 2)
-    }
+  async rebuild() {
+    var proms: Promise<any>[] = []
+
+    for (var f of this.files)
+      proms.push(f.render())
+  }
+
+  async rebuildSingle() {
+
   }
 
 }

@@ -20,6 +20,8 @@ export class KronkLoader extends nj.Loader {
     var file = this.project.files_by_name[name + '.nks']
     if (!file) throw new Error(`nunjucks: can't extend ${name}`)
 
+    this.project.deps.add(this.file, file)
+
     if (file.contents == null)
       await file.parse()
 
@@ -41,7 +43,7 @@ export async function nunjucksParser(file: File) {
 
   if (match && match.index === 0) {
     file.contents = ct.replace(match[0], '')
-    file.data = parseData(match[1])
+    file.own_data = parseData(match[1])
   } else {
     file.contents = ct
   }

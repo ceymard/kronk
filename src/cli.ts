@@ -64,6 +64,5 @@ const watcher = chokidar.watch(pkg.kronk.src, {
 })
 
 watcher.on('change', (path: string) => {
-
-  console.log(path)
+  p.update(path)
 })
