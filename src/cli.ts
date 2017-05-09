@@ -67,8 +67,9 @@ watcher.on('add', (path: string) => {
   if (!initing) {
     if (f.basename === '__data__')
       p.rebuild()
-    else
+    else {
       p.update(path)
+    }
   }
 })
 

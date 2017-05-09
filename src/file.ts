@@ -3,6 +3,7 @@ import * as fs from 'mz/fs'
 import * as pth from 'path'
 import * as deep from 'deep-extend'
 import * as mk from 'mkdirp2'
+import * as c from 'colors'
 
 import {Prom} from './helpers'
 import {Data, DEFAULTS} from './data'
@@ -144,12 +145,12 @@ export class File {
           await renderer(this, data)
         }
       } catch (e) {
-        console.error(`!! ${this.name} - ${e.message}`)
+        console.error(c.bold.red(`!!`), `${this.name} - ${e.message}`)
       }
     }
 
     if (this.rendered != null) {
-      this.write(data)
+      await this.write(data)
     }
 
   }
@@ -168,7 +169,7 @@ export class File {
     var dirname = pth.dirname(output)
     await mk.promise(dirname)
     await fs.writeFile(output, this.rendered!)
-    console.log(' >', output.replace(this.project.dir_build + '/', ''))
+    console.log(c.bold.green(' >'), output.replace(this.project.dir_build + '/', ''))
   }
 
 }

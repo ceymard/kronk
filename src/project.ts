@@ -1,6 +1,7 @@
 
 import * as path from 'path'
 import * as fs from 'mz/fs'
+import * as c from 'colors'
 
 import {File} from './file'
 
@@ -109,24 +110,37 @@ export class Project {
     this.deps.remove(f)
   }
 
-  update(pth: string) {
+  async update(pth: string) {
     var f = this.getFile(pth)
+
     if (f) {
+      var update_lbl = c.bold.yellow(`update ${f.name}`)
+      console.time(update_lbl)
+
       f.parsed = null
-      console.log(` * ${f.name} changed`)
-      f.render()
+      console.log(c.bold.yellow(` *`), `${f.name} changed`)
+      var proms: Promise<any>[] = []
+      proms.push(f.render())
 
       for (var f2 of this.deps.get(f)) {
-        f2.render()
+        proms.push(f2.render())
       }
+
+      await Promise.all(proms)
+      console.timeEnd(update_lbl)
     }
   }
 
   async rebuild() {
     var proms: Promise<any>[] = []
 
+    var lbl = c.bold.green('rebuild')
+    console.time(lbl)
     for (var f of this.files)
       proms.push(f.render())
+
+    await Promise.all(proms)
+    console.timeEnd(lbl)
   }
 
 }
