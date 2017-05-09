@@ -118,7 +118,6 @@ export class Project {
       console.time(update_lbl)
 
       f.parsed = null
-      console.log(c.bold.yellow(` *`), `${f.name} changed`)
       var proms: Promise<any>[] = []
       proms.push(f.render())
 
