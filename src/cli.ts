@@ -43,21 +43,12 @@ var pkg = getPackageJson()
 var p = new Project(pkg.kronk.src, pkg.kronk.build)
 
 
-async function run() {
-  try {
-    await p.init()
-    // p.showTree()
-    await p.rebuild()
-  } catch (e) {
-    console.error(e.stack)
-  }
-}
-
 process.on('unhandledRejection', (reason: Error) => {
   console.error(reason);
 });
 
-run()
+
+var initing = true
 
 const watcher = chokidar.watch(pkg.kronk.src, {
   persistent: true
@@ -65,4 +56,24 @@ const watcher = chokidar.watch(pkg.kronk.src, {
 
 watcher.on('change', (path: string) => {
   p.update(path)
+})
+
+watcher.on('add', (path: string) => {
+  var f = p.addFile(path)
+  if (!initing) {
+    if (f.basename === '__data__')
+      p.rebuild()
+    else
+      p.update(path)
+  }
+})
+
+watcher.on('ready', () => {
+  initing = false
+  p.rebuild()
+})
+
+watcher.on('unlink', (path: string) => {
+  p.removeFile(path)
+  console.log('removed', path)
 })

@@ -108,7 +108,7 @@ export class File {
       if (pth.relative(f.dir, this.dir).indexOf('..') !== 0) {
         if (!f.parsed) await f.parse()
         data = deep(data, f.own_data)
-        this.project.deps.add(this, f)
+        this.project.deps.add(f, this)
       }
 
     }

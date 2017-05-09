@@ -28,16 +28,19 @@ export class Deps {
   }
 
   get(on: File): File[] {
-    var set = this.depends_on.get(on)
+    var set = this.depended_by.get(on)
     if (!set) return []
     return [...set]
   }
 
   remove(file: File) {
     for (var f of this.depends_on.get(file) || []) {
+      console.log(`depended on ${f.name}`)
       var set = this.depended_by.get(f)
-      if (!set) continue
-      set.delete(f)
+      if (!set) {
+        continue
+      }
+      set.delete(file)
     }
   }
 }
@@ -83,22 +86,34 @@ export class Project {
   }
 
   addFile(pth: string) {
+    if (pth.startsWith('/')) pth = path.relative(this.basedir, pth)
     var f = File.from(this.basedir, pth, this)
     this.files_by_name[pth] = f
     if (f.basename === '__data__')
       this.data_files.add(f)
     else
       this.files.add(f)
+
+    return f
+  }
+
+  getFile(pth: string): File | null {
+    var p = path.relative(this.basedir, pth)
+    return this.files_by_name[p]
   }
 
   removeFile(pth: string) {
-
+    var f = this.getFile(pth)
+    if (!f) return
+    this.files.delete(f)
+    this.data_files.delete(f)
+    this.deps.remove(f)
   }
 
   update(pth: string) {
-    var p = pth.replace(this.basedir + '/', '')
-    var f = this.files_by_name[p]
+    var f = this.getFile(pth)
     if (f) {
+      console.log(` * ${f.name} changed`)
       f.render()
 
       for (var f2 of this.deps.get(f)) {
@@ -112,10 +127,6 @@ export class Project {
 
     for (var f of this.files)
       proms.push(f.render())
-  }
-
-  async rebuildSingle() {
-
   }
 
 }
