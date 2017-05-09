@@ -8,13 +8,13 @@ import * as nj from 'nunjucks'
 
 var re_nks_data = /^(?:\s|\n)*\{#-?(((?!#\}).|\n)*)-?#\}(\n|\s)*/mi
 
-var KronkLoader: any = nj.Loader.extend({
 
-  async: true,
+export class KronkLoader extends nj.Loader {
+  async = true
 
-  init(project: Project) {
-    this.project = project
-  },
+  constructor(public project: Project, public file: File) {
+    super()
+  }
 
   async getSource(name: string, done: (err: any, res: any) => any) {
     var file = this.project.files_by_name[name + '.nks']
@@ -29,7 +29,7 @@ var KronkLoader: any = nj.Loader.extend({
       noCache: true // we do the caching ourselves.
     })
   }
-} as any)
+}
 
 
 export async function nunjucksParser(file: File) {
@@ -56,7 +56,7 @@ async function nunjucksRenderer(file: File, data: Data) {
   // Fixme: check for kronk.nunjuck
   if (!file.is('nks')) return
 
-  var env = new nj.Environment(new KronkLoader(file.project))
+  var env = new nj.Environment(new KronkLoader(file.project, file) as any)
   var p = new Prom<string>()
 
   env.renderString(file.contents, data, p.callback())
@@ -65,4 +65,3 @@ async function nunjucksRenderer(file: File, data: Data) {
 }
 
 File.renderers.push(nunjucksRenderer)
-

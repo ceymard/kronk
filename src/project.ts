@@ -40,6 +40,14 @@ export class Project {
 
   }
 
+  update(pth: string) {
+    var p = pth.replace(this.basedir, '')
+    var f = this.files_by_name[p]
+    if (f) {
+      f.render({} as Data)
+    }
+  }
+
   addFile(pth: string) {
     var f = File.from(this.basedir, pth, this)
     this.files_by_name[pth] = f

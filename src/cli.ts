@@ -2,6 +2,7 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
+import * as chokidar from 'chokidar'
 
 import {Project} from './project'
 
@@ -57,3 +58,12 @@ process.on('unhandledRejection', (reason: Error) => {
 });
 
 run()
+
+const watcher = chokidar.watch(pkg.kronk.src, {
+  persistent: true
+})
+
+watcher.on('change', (path: string) => {
+
+  console.log(path)
+})
