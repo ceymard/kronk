@@ -175,10 +175,4 @@ export class File {
 }
 
 
-export interface Handler {
-
-  handle(file: File): Promise<any>
-
-}
-
 import './handlers'

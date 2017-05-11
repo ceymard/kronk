@@ -17,8 +17,13 @@ export class KronkLoader extends nj.Loader {
   }
 
   async getSource(name: string, done: (err: any, res?: any) => any) {
-    var file = this.project.files_by_name[name + '.nks']
-    if (!file) return done(new Error(`nunjucks: can't extend ${name}`))
+    if (name.indexOf(this.project.basedir) === 0) name = name.replace(this.project.basedir + '/', '')
+    var complete = name + '.nks'
+
+    var file = this.project.files_by_name[complete]
+    if (!file) {
+      return done(new Error(`nunjucks: can't extend ${complete}`))
+    }
 
     this.project.deps.add(file, this.file)
 

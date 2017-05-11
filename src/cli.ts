@@ -40,6 +40,7 @@ function getPackageJson(current_dir: string = process.cwd()): PackageJson {
 /// 1. Look for the package.json
 var pkg = getPackageJson()
 
+process.chdir(pkg.kronk.src)
 /// 2. Extract basic informations to create the Project
 var p = new Project(pkg.kronk.src, pkg.kronk.build)
 

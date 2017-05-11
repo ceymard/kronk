@@ -2,6 +2,9 @@
 import {parseData} from '../helpers'
 import {File} from '../file'
 import {Data} from '../data'
+import * as deep from 'deep-extend'
+
+import * as md from 'markdown-it'
 
 var re_md_data = /^(?:\s|\r|\n)*<!-+-(((?!-->).|\r|\n)*)-+->/mg
 
@@ -19,7 +22,7 @@ export async function parseMarkdown(file: File) {
     file.own_data = parseData(match[1])
   }
 
-  file.contents = ct
+  file.contents = ct // markdown.render(ct)
 }
 
 File.parsers.push(parseMarkdown)
@@ -28,6 +31,10 @@ File.parsers.push(parseMarkdown)
 export async function markdownRenderer(file: File, data: Data) {
 
   if (!file.is('md')) return
+
+  var opts = deep({html: true}, data.kronk.markdown)
+  var markdown = md(opts)
+  file.contents = markdown.render(file.contents)
   file.rendered = await renderNunjucks(file, data)
 
 }
