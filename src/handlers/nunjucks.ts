@@ -19,7 +19,6 @@ export class KronkLoader extends nj.Loader {
   async getSource(name: string, done: (err: any, res?: any) => any) {
     if (name.indexOf(this.project.basedir) === 0) name = name.replace(this.project.basedir + '/', '')
     var complete = name + '.nks'
-
     var file = this.project.files_by_name[complete]
     if (!file) {
       return done(new Error(`nunjucks: can't extend ${complete}`))
@@ -27,7 +26,7 @@ export class KronkLoader extends nj.Loader {
 
     this.project.deps.add(file, this.file)
 
-    if (file.contents == null)
+    if (file.parsed == null || file.contents == null)
       await file.parse()
 
     done(null, {
@@ -58,7 +57,7 @@ export async function nunjucksParser(file: File) {
 File.parsers.push(nunjucksParser)
 
 
-export function renderNunjucks(file: File, data: Data) {
+export async function renderNunjucks(file: File, data: Data) {
   var env = new nj.Environment(new KronkLoader(file.project, file) as any)
   var p = new Prom<string>()
 

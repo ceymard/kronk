@@ -14,7 +14,8 @@ export interface Data {
       extends?: string
       block?: string
     },
-    output_name?: string
+    output_extension?: string
+
   }
 
 }

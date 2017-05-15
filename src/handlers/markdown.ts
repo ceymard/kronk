@@ -32,11 +32,13 @@ export async function markdownRenderer(file: File, data: Data) {
 
   if (!file.is('md')) return
 
-  var opts = deep({html: true}, data.kronk.markdown)
+  var opts = deep({
+    html: true,
+  }, data.kronk.markdown)
+
   var markdown = md(opts)
   file.contents = markdown.render(file.contents)
   file.rendered = await renderNunjucks(file, data)
-
 }
 
 File.renderers.push(markdownRenderer)

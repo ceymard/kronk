@@ -155,6 +155,10 @@ export class File {
 
   }
 
+  getURL(data: Data): string {
+    return this.name.replace(/\.(md|nks)$/, '.html')
+  }
+
   /**
    * Once the file has been rendered, write its output into the destination.
    */
@@ -163,7 +167,7 @@ export class File {
     // FIXME this should change !!
     var output = pth.join(
       this.project.dir_build,
-      data.kronk.output_name || this.name.replace(/(md|nks)$/, 'html')
+      this.getURL(data)
     )
 
     var dirname = pth.dirname(output)

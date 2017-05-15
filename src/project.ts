@@ -115,9 +115,12 @@ export class Project {
 
     if (f) {
       var update_lbl = c.bold.yellow(`update ${f.name}`)
-      console.time(update_lbl)
-
       f.parsed = null
+      f.contents = ''
+
+      console.time(update_lbl)
+      await f.parse()
+
       var proms: Promise<any>[] = []
       proms.push(f.render())
 
