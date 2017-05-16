@@ -5,6 +5,7 @@ import * as c from 'colors'
 
 import {File} from './file'
 
+var _timers = 1
 
 export class Deps {
   // List of all the files that depend on this one.
@@ -114,7 +115,7 @@ export class Project {
     var f = this.getFile(pth)
 
     if (f) {
-      var update_lbl = c.bold.yellow(`update ${f.name}`)
+      var update_lbl = c.bold.yellow(`${_timers++} - update ${f.name}`)
       f.parsed = null
       f.contents = ''
 
