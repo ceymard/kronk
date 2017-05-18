@@ -4,7 +4,7 @@ import {File} from '../file'
 import {Data} from '../data'
 import * as deep from 'deep-extend'
 
-import * as hljs from 'highlight.js'
+import {parse} from 'pegp'
 import * as md from 'markdown-it'
 
 var re_md_data = /^(?:\s|\r|\n)*<!-+-(((?!-->).|\r|\n)*)-+->/mg
@@ -36,15 +36,8 @@ export async function markdownRenderer(file: File, data: Data) {
   var opts = deep({
     html: true,
     highlight: function (str: string, lang: string) {
-      if (lang && hljs.getLanguage(lang)) {
-
-        try {
-          return hljs.highlight(lang, str).value;
-        } catch (__) { console.error(__)}
-      }
-    return ''; // use external default escaping
-  }
-
+      return parse(str)
+    }
   }, data.kronk.markdown)
 
   var markdown = md(opts)
