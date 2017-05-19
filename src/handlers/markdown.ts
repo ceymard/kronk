@@ -4,7 +4,7 @@ import {File} from '../file'
 import {Data} from '../data'
 import * as deep from 'deep-extend'
 
-import {parse} from 'pegp'
+import {parse} from 'hues'
 import * as md from 'markdown-it'
 
 var re_md_data = /^(?:\s|\r|\n)*<!-+-(((?!-->).|\r|\n)*)-+->/mg
@@ -34,11 +34,13 @@ export async function markdownRenderer(file: File, data: Data) {
   if (!file.is('md')) return
 
   var opts = deep({
-    html: true,
-    highlight: function (str: string, lang: string) {
-      return parse(str)
-    }
-  }, data.kronk.markdown)
+      html: true,
+      highlight: function (str: string, lang: string) {
+        return parse(str, lang)
+      }
+    },
+    data.kronk.markdown
+  )
 
   var markdown = md(opts)
   file.contents = markdown.render(file.contents)
