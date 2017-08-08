@@ -1,6 +1,6 @@
 {
   "name": "kronk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "bin": {
     "kronk": "./build/cli.js"
   },
@@ -35,6 +35,7 @@
     "mz": "^2.6.0",
     "node-eval": "^1.1.0",
     "nunjucks": "^3.0.0",
+    "require-extensions": "0.0.4",
     "toml": "^2.3.2",
     "tslib": "^1.6.0",
     "typescript": "^2.3.2",
