@@ -4,8 +4,8 @@ export var last_render = ''
 export type Child = string | number | Node
 
 export interface Attributes {
-  $$children?: Child | Child[]
-  // [name: string]: string
+  // $$children?: Child | Child[]
+  [name: string]: string
 }
 
 
@@ -41,6 +41,7 @@ export type FunctionComponent = (attrs: Attributes | null, children: Node[]) => 
 
 
 export function k(base: string | FunctionComponent, attrs: Attributes | null, ...children: any[]): Node {
+
   if (typeof base === 'function')
     return base(attrs, children)
   return new Node(base, attrs, children)
