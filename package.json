@@ -39,7 +39,7 @@
     "require-extensions": "0.0.4",
     "toml": "^2.3.2",
     "tslib": "^1.6.0",
-    "typescript": "^2.3.2",
+    "typescript": "^2.4.2",
     "typescript.api": "^0.7.7"
   },
   "devDependencies": {

@@ -65,6 +65,42 @@ export class Cache {
       getCurrentDirectory: () => process.cwd(),
       getCompilationSettings: () => this.options,
       getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
+      getCustomTransformers() {
+        return {
+          before: [(context: ts.TransformationContext) => {
+            return (source: ts.SourceFile) => {
+              // FIXME : change toplevel TSX statements that do not
+              // go into a variable to be the render() function ?1
+              // console.log(source.fileName)
+              const last_node = source.statements[source.statements.length - 1]
+              if (last_node.kind === ts.SyntaxKind.ExpressionStatement) {
+                const first = last_node.getChildren()[0]
+                if (first.kind === ts.SyntaxKind.JsxElement) {
+                  // const f = first as ts.JsxElement
+
+                  const fn = ts.createFunctionDeclaration(
+                    /* decorators */ undefined,
+                    undefined, // /* modifiers */ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+                    /* asterisk */ undefined,
+                    ts.createIdentifier('render'),
+                    /* generic */ undefined,
+                    /* params */ [],
+                    /* return type */ undefined,
+                    ts.createBlock(
+                      [ts.createReturn(ts.createLiteral(1))],
+                      true
+                      // [ts.createReturn(f)]
+                    )
+                  )
+                  source.statements[source.statements.length - 1] = fn
+                  // const exp = ts.createExportAssignment(undefined, undefined, true, fn)
+                }
+              }
+              return source
+            }
+          }]
+        }
+      },
       fileExists: ts.sys.fileExists,
       readFile: ts.sys.readFile,
       readDirectory: ts.sys.readDirectory,
@@ -85,10 +121,14 @@ export class Cache {
     var old_require = m.require.bind(m)
 
     m.require = (name: string) => {
+      // First try to use standard require over our
+      // custom version.
       try {
         return old_require(name)
       } catch (e) { }
 
+      // If the module was not found, it may most likely be because
+      // we're looking for a .ts or .tsx one.
       const full_name = path.resolve(path.dirname(o.name), name).replace('.js', '')
 
       if (this.files[full_name + '.ts'])
