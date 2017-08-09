@@ -80,19 +80,26 @@ export class Cache {
 
                   const fn = ts.createFunctionDeclaration(
                     /* decorators */ undefined,
-                    undefined, // /* modifiers */ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+                    /* modifiers */ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
                     /* asterisk */ undefined,
                     ts.createIdentifier('render'),
                     /* generic */ undefined,
                     /* params */ [],
                     /* return type */ undefined,
                     ts.createBlock(
-                      [ts.createReturn(ts.createLiteral(1))],
-                      true
-                      // [ts.createReturn(f)]
+                      // [ts.createReturn(ts.createLiteral(1))],
+                      // true
+                      [ts.createReturn(first as ts.JsxElement)]
                     )
                   )
-                  source.statements[source.statements.length - 1] = fn
+
+                  source.statements.push(fn)
+                  const printer = ts.createPrinter({
+                      newLine: ts.NewLineKind.LineFeed,
+                  });
+                  const result = printer.printNode(ts.EmitHint.Unspecified, fn, source);
+                  console.log(result)
+
                   // const exp = ts.createExportAssignment(undefined, undefined, true, fn)
                 }
               }
