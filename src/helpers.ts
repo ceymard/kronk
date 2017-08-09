@@ -1,5 +1,5 @@
 
-import {Tag} from './k'
+import {k} from './k'
 
 /**
  * Shorthand

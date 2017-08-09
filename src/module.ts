@@ -8,7 +8,7 @@ import * as _Module from 'module'
 import {k} from './k'
 const gg: any = global;
 
-gg.k = k
+gg.K = k
 gg.Block = function () { return k('div', null) }
 
 export interface Module {
@@ -47,7 +47,7 @@ export class Cache {
   }
 
   /**
-   * 
+   *
    */
   createService(files: string[], options: ts.CompilerOptions) {
     this.registry = ts.createDocumentRegistry()
@@ -72,7 +72,7 @@ export class Cache {
   }
 
   /**
-   * 
+   *
    */
   add(source: string, o: ts.OutputFile): any {
     var m = new Module(o.name, '')
@@ -105,7 +105,7 @@ export class Cache {
   }
 
   get(name: string) {
-    
+
   }
 
   _get(name: string) {
@@ -113,7 +113,7 @@ export class Cache {
   }
 
   /**
-   * 
+   *
    */
   compile(name: string): any {
     if (!this.files[name]) {
@@ -131,12 +131,13 @@ export class Cache {
     let output = this.service.getEmitOutput(name)
     this.logErrors(name)
     output.outputFiles.forEach(o => {
+      console.log(o.text)
       this.add(name, o)
     })
   }
 
   /**
-   * 
+   *
    */
   getModule(name: string) {
 

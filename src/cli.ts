@@ -8,12 +8,12 @@ import * as chokidar from 'chokidar'
 import {Cache} from './module'
 
 
-const options: ts.CompilerOptions = { 
+const options: ts.CompilerOptions = {
   noImplicitAny: true,
   target: ts.ScriptTarget.ES5,
   module: ts.ModuleKind.CommonJS,
   jsx: ts.JsxEmit.React,
-  jsxFactory: 'k'
+  jsxFactory: 'K'
 }
 
 var filenames = process.argv.slice(2)
