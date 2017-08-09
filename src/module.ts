@@ -6,7 +6,10 @@ import * as col from 'colors'
 import * as _Module from 'module'
 
 import {k} from './k'
-(global as any).k = k
+const gg: any = global;
+
+gg.k = k
+gg.Block = function () { return k('div', null) }
 
 export interface Module {
   new (filename: string, parent: string): Module
@@ -121,6 +124,9 @@ export class Cache {
     } else {
       this.files[name].version++
     }
+
+    // let src = this.service.getProgram().getSourceFile(name)
+    // const res = this.service.getProgram().emit(src)
 
     let output = this.service.getEmitOutput(name)
     this.logErrors(name)

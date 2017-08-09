@@ -1,6 +1,8 @@
 import {Node, Attributes} from './k'
 
 declare global {
+
+  function Block(attrs: {name: string}, ...children: Node[]): Node
   function k(name: string | JSX.ElementClassFn, attrs: Attributes | null, ...children: Node[]): Node;
 
   namespace JSX {
