@@ -1,8 +1,7 @@
 
-import {Node} from './k'
+import {Tag} from './k'
 
-export class Doctype extends Node {
-  render(indent = '') {
-    return `${indent}<!doctype html>`
-  }
-}
+/**
+ * Shorthand
+ */
+export const Doctype = () => '<!doctype html>'

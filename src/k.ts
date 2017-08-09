@@ -1,19 +1,23 @@
 
 export var last_render = ''
 
+export type Child = string | number | Node
+
 export interface Attributes {
-  [name: string]: string
+  $$children?: Child | Child[]
+  // [name: string]: string
 }
+
 
 /**
  * The base node.
  */
-export class Tag {
+export class Node {
 
   constructor(
     public tagname: string, 
     public attributes: Attributes | null, 
-    public children: Tag[]) 
+    public children: Node[]) 
   { }
 
   toString(indent = ''): string {
@@ -21,7 +25,7 @@ export class Tag {
 
     // Compute the attributes
     var attributes = a == null ? '' :
-      ' ' + Object.keys(a).map(key => `${key}="${a![key]}"`).join(' ')
+      ' ' + Object.keys(a).map(key => `${key}="${(a as any)![key]}"`).join(' ')
 
     var res = `${indent}<${this.tagname}${attributes}>${this.children.map(c => '\n' + c.toString(indent + '  '))}
 ${indent}</${this.tagname}>`
@@ -33,15 +37,11 @@ ${indent}</${this.tagname}>`
 }
 
 
-export type FunctionComponent = (attrs: Attributes | null, children: Tag[]) => Tag
-
-export class Component {
-  render(): Tag | string {
-    return null
-  }
-}
+export type FunctionComponent = (attrs: Attributes | null, children: Node[]) => Node
 
 
-export function k(name: string, attrs: Attributes | null, ...children: any[]): Tag {
-  return new Tag(name, attrs, children)
+export function k(base: string | FunctionComponent, attrs: Attributes | null, ...children: any[]): Node {
+  if (typeof base === 'function')
+    return base(attrs, children)
+  return new Node(base, attrs, children)
 }
