@@ -4,6 +4,7 @@ import * as path from 'path'
 import * as ts from 'typescript'
 import * as col from 'colors'
 import * as _Module from 'module'
+import {transformer} from './transform'
 
 import {k} from './k'
 const gg: any = global;
@@ -11,28 +12,31 @@ const gg: any = global;
 gg.K = k
 gg.Block = function () { return k('div', null) }
 
-export interface Module {
-  new (filename: string, parent: string): Module
-
-  exports: any
-  loaded: boolean
-  paths: string[]
-  require(path: string): any
-  filename: string
-  _compile(code: string, filename: string): any
+declare global {
+  interface NodeModule {
+    // exports: any
+    // loaded: boolean
+    // paths: string[]
+    // require(path: string): any
+    // filename: string
+    paths: string[]
+    _compile(code: string, filename: string): any
+  }
 }
 
-const Module = _Module as new (filename: string, parent: string) => Module
 
-export function createModule() {
-
+const Module = _Module as {
+  new (filename: string, parent: string): NodeModule
+  _nodeModulePaths(dir: string): string[]
 }
 
+
+/////////////////////////////////////////////
 
 export interface CachedModule {
   name: string
   source?: string
-  module?: Module
+  module?: NodeModule
   version: number
 }
 
@@ -67,45 +71,7 @@ export class Cache {
       getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
       getCustomTransformers() {
         return {
-          before: [(context: ts.TransformationContext) => {
-            return (source: ts.SourceFile) => {
-              // FIXME : change toplevel TSX statements that do not
-              // go into a variable to be the render() function ?1
-              // console.log(source.fileName)
-              const last_node = source.statements[source.statements.length - 1]
-              if (last_node.kind === ts.SyntaxKind.ExpressionStatement) {
-                const first = last_node.getChildren()[0]
-                if (first.kind === ts.SyntaxKind.JsxElement) {
-                  // const f = first as ts.JsxElement
-
-                  const fn = ts.createFunctionDeclaration(
-                    /* decorators */ undefined,
-                    /* modifiers */ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-                    /* asterisk */ undefined,
-                    ts.createIdentifier('render'),
-                    /* generic */ undefined,
-                    /* params */ [],
-                    /* return type */ undefined,
-                    ts.createBlock(
-                      // [ts.createReturn(ts.createLiteral(1))],
-                      // true
-                      [ts.createReturn(first as ts.JsxElement)]
-                    )
-                  )
-
-                  source.statements.push(fn)
-                  const printer = ts.createPrinter({
-                      newLine: ts.NewLineKind.LineFeed,
-                  });
-                  const result = printer.printNode(ts.EmitHint.Unspecified, fn, source);
-                  console.log(result)
-
-                  // const exp = ts.createExportAssignment(undefined, undefined, true, fn)
-                }
-              }
-              return source
-            }
-          }]
+          before: [transformer]
         }
       },
       fileExists: ts.sys.fileExists,
@@ -179,7 +145,8 @@ export class Cache {
     this.logErrors(name)
     output.outputFiles.forEach(o => {
       console.log(o.text)
-      this.add(name, o)
+      var res = this.add(name, o)
+      // console.log(res)
     })
   }
 

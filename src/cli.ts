@@ -7,6 +7,9 @@ import * as chokidar from 'chokidar'
 
 import {Cache} from './module'
 
+if (global.v8debug) {
+  global.v8debug.Debug.setBreakOnException()
+}
 
 const options: ts.CompilerOptions = {
   noImplicitAny: true,
