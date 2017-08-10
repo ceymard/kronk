@@ -1,5 +1,12 @@
 
+/**
+ * Will not render the file !
+ */
+export const isTemplate = true;
 
-<Block name='content'>
-  <h1>Youpi !</h1>
-</Block>
+<Extends module={require('./tpl')}>
+  <Block name='content'>
+    <h1>Youpi !</h1>
+  </Block>
+
+</Extends>

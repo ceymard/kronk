@@ -107,9 +107,9 @@ export class Cache {
       if (this.files[full_name + '.ts'])
         return this.files[full_name + '.ts'].module!.exports
 
-      this.compile(full_name + '.ts')
+      this.compile(full_name + '.tsx')
       // console.log(this.files[trying_resolve + '.ts'])
-      return this.files[full_name + '.ts'].module!.exports
+      return this.files[full_name + '.tsx'].module!.exports
     }
 
     m._compile(o.text, o.name)
@@ -167,10 +167,10 @@ export class Cache {
       let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
       if (diagnostic.file) {
         let { line } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-        console.log(`${col.yellow(diagnostic.file.fileName)}:${col.red.bold('' + line + 1)} ${col.gray(message)}`);
+        console.error(`${col.yellow(diagnostic.file.fileName)}:${col.red.bold('' + (line + 1))} ${col.gray(message)}`);
       }
       else {
-        console.log(`${message}`);
+        console.error(`${message}`);
       }
     });
   }

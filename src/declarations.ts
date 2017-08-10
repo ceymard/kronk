@@ -10,7 +10,8 @@ declare global {
   /**
    * Extend another module
    */
-  function Extends(module: string): void
+  function Extends(attrs: {template: {render: () => any}}): Node
+  function Super(): Node
 
   /**
    * The DOM building function.
