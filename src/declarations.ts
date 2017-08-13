@@ -3,7 +3,7 @@ import {Node, Attributes} from './k'
 declare global {
 
   /**
-   * 
+   *
    */
   function Block(attrs: {name: string}, ...children: Node[]): Node
 
@@ -20,12 +20,14 @@ declare global {
 
   namespace JSX {
     type Element = Node;
+
     // interface ElementAttributesProperty {
     //     attrs: any;
     // }
     // interface ElementChildrenAttribute {
     //     $$children: any;
     // }
+
     interface ElementClassFn {
         (attrs: Attributes, children: Node[]): Element;
     }

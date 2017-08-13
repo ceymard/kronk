@@ -1,48 +1,62 @@
+import {Node, TextNode, TagNode, Attributes} from './node'
 
-export var last_render = ''
 
 export type Child = string | number | Node
-
-export interface Attributes {
-  // $$children?: Child | Child[]
-  [name: string]: string
-}
-
-
-/**
- * The base node.
- */
-export class Node {
-
-  constructor(
-    public tagname: string, 
-    public attributes: Attributes | null, 
-    public children: Node[]) 
-  { }
-
-  toString(indent = ''): string {
-    var a = this.attributes
-
-    // Compute the attributes
-    var attributes = a == null ? '' :
-      ' ' + Object.keys(a).map(key => `${key}="${(a as any)![key]}"`).join(' ')
-
-    var res = `${indent}<${this.tagname}${attributes}>${this.children.map(c => '\n' + c.toString(indent + '  '))}
-${indent}</${this.tagname}>`
-
-    // We need this for files that do not export the render() method.
-    last_render = res
-    return res
-  }
-}
 
 
 export type FunctionComponent = (attrs: Attributes | null, children: Node[]) => Node
 
 
-export function k(base: string | FunctionComponent, attrs: Attributes | null, ...children: any[]): Node {
+export abstract class Component {
+
+  constructor(public attrs: Attributes | null) { }
+  abstract render(attrs: Attributes | null, children: Node[]): Node
+}
+
+
+export type ComponentInstanciator<T extends Component> =
+  (new (attrs: Attributes | null) => T)
+
+
+function _isComponentInstanciator(b: any): b is ComponentInstanciator<any> {
+  if (typeof (b as any).prototype.render === 'function')
+    return true
+  return false
+}
+
+
+function _getNodes(children: Child[]) {
+  return children.map(c => {
+    if (c instanceof Node)
+      return c
+    if (typeof c === 'string' || typeof c === 'number')
+      return new TextNode(c.toString())
+    throw new Error('incorrect child type')
+  })
+}
+
+
+/**
+ * The main function.
+ * @param base
+ * @param attrs
+ * @param children
+ */
+export function k(
+  base: string
+    | FunctionComponent
+    | ComponentInstanciator<any>,
+    attrs: Attributes | null, ..._children: Child[]): Node {
+
+  const children = _getNodes(_children)
+
+  if (_isComponentInstanciator(base)) {
+    const cmp = new base(attrs)
+    return cmp.render(attrs, children)
+  }
 
   if (typeof base === 'function')
     return base(attrs, children)
-  return new Node(base, attrs, children)
+
+  return new TagNode(base, attrs, children)
 }
