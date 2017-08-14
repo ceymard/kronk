@@ -1,16 +1,8 @@
-import {Node, Attributes} from './k'
+import {Node, Attributes} from './node'
 
 declare global {
 
-  /**
-   *
-   */
-  function Block(attrs: {name: string}, ...children: Node[]): Node
-
-  /**
-   * Extend another module
-   */
-  function Extends(attrs: {template: {render: () => any}}): Node
+  function F(): Node
   function Super(): Node
 
   /**

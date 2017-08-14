@@ -15,7 +15,7 @@ export class Template<T> {
 
     constructor(public _render: TemplateFunction<T>) { }
 
-    extend<U>(context: U): Template<T & U> {
+    extend<U extends Partial<T>>(context: U): Template<T & U> {
       return new Template(this._render as TemplateFunction<T & U>)
     }
 
@@ -30,4 +30,9 @@ export class Template<T> {
 
 export function template<T>(base_context: T, fn: TemplateFunction<T>): Template<T> {
   return new Template(fn)
+}
+
+
+export function block(def: Node): Node {
+
 }
