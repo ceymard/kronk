@@ -4,17 +4,30 @@ import {Node} from './node'
 export type TemplateFunction<T> = (context: T) => Node
 
 
+export class Block {
+
+}
+
+
 export class Template<T> {
 
-    constructor(public context: T, public render: TemplateFunction<T>) { }
+    context: T | null = null
 
-    extend<U extends T>(context: U): Template<U> {
-      return new Template(context, this.render as TemplateFunction<U>)
+    constructor(public _render: TemplateFunction<T>) { }
+
+    extend<U>(context: U): Template<T & U> {
+      return new Template(this._render as TemplateFunction<T & U>)
+    }
+
+    render() {
+      if (!this.context)
+        throw new Error('Templates need a context to be rendered')
+      return this._render(this.context)
     }
 
 }
 
 
 export function template<T>(base_context: T, fn: TemplateFunction<T>): Template<T> {
-  return new Template(base_context, fn)
+  return new Template(fn)
 }
