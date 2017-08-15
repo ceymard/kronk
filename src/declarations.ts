@@ -1,4 +1,4 @@
-import {Node, Attributes} from './node'
+import {Node, Attributes, Child} from './node'
 
 declare global {
 
@@ -13,12 +13,13 @@ declare global {
   namespace JSX {
     type Element = Node;
 
-    // interface ElementAttributesProperty {
-    //     attrs: any;
-    // }
-    // interface ElementChildrenAttribute {
-    //     $$children: any;
-    // }
+    interface ElementAttributesProperty {
+        attrs: any;
+    }
+
+    interface ElementChildrenAttribute {
+        $$children: Child;
+    }
 
     interface ElementClassFn {
         (attrs: Attributes, children: Node[]): Element;

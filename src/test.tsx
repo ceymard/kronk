@@ -6,7 +6,7 @@ export class BaseTemplate extends Template {
 
   a = 1
 
-  title? = 'youpi !'
+  title = 'youpi !'
 
   head = () => <F>
     {this.a}
