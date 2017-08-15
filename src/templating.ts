@@ -9,30 +9,18 @@ export class Block {
 }
 
 
-export class Template<T> {
+export abstract class Template {
 
-    context: T | null = null
+    constructor() { }
 
-    constructor(public _render: TemplateFunction<T>) { }
-
-    extend<U extends Partial<T>>(context: U): Template<T & U> {
-      return new Template(this._render as TemplateFunction<T & U>)
+    static render<T extends Template>(this: new () => T, ctx: Partial<T> = {}): Node {
+      var a = new this()
+      for (var x in ctx)
+        a[x] = ctx[x]
+      return a.__main__()
     }
 
-    render() {
-      if (!this.context)
-        throw new Error('Templates need a context to be rendered')
-      return this._render(this.context)
-    }
+    abstract __main__: () => Node
 
 }
 
-
-export function template<T>(base_context: T, fn: TemplateFunction<T>): Template<T> {
-  return new Template(fn)
-}
-
-
-export function block(def: Node): Node {
-
-}

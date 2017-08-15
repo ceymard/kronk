@@ -1,21 +1,36 @@
 
-import {template, block} from './templating'
+import {Template} from './templating'
 import './declarations'
 
-export const tpl = template({
-  a: 1,
-  head: block(<F>
+export class BaseTemplate extends Template {
+
+  a = 1
+
+  title? = 'youpi !'
+
+  head = () => <F>
+    {this.a}
     <meta charset='utf-8'/>
-  </F>)
-}, ctx =>
-<html>
-  <head>
-    {ctx.head}
-  </head>
-  Showing off {ctx.a}
-</html>)
+  </F>
+
+  __main__ = () => <html>
+    <head>
+      <title>{this.title}</title>
+      {this.head}
+    </head>
+  </html>
+
+}
 
 
-export const tpl2 = tpl.extend({
-  a: '231'
-})
+export class SubTemplate extends BaseTemplate {
+
+  head = () => <F>
+    {super.head}
+    <meta lang='en'/>
+  </F>
+
+}
+
+
+const res = SubTemplate.render({a: 23, title: 'youpi !'})
