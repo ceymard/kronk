@@ -24,7 +24,7 @@ export function runFile(f: File, mod: NodeModule) {
 
   const res = f.render()
   if (res instanceof Node) {
-    console.error(`${col.green.bold(' => ' + f.filename)} (${col.gray(mod.filename.replace(base_re, ''))})`)
+    console.error(`${col.green.bold(' => ' + f.filename)} ${col.gray('(' + mod.filename.replace(base_re, '') + ')')}`)
     console.error(res.render('  '))
   }
 }
@@ -40,12 +40,13 @@ function _foreach(v: any, fn: (a: any) => void) {
 
 const visited: {[file: string]: boolean} = {}
 
+
 export function realRun(module: NodeModule | undefined) {
   if (!module || visited[module.filename]) return
 
   const xp = module.exports
 
-  // FIXME should check here if the user meant to 
+  // FIXME should check here if the user meant to
   // only render a specific file.
 
   if (xp instanceof File) runFile(xp, module)
