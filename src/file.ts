@@ -12,12 +12,4 @@ export class File {
 
   }
 
-  /**
-   * Take a guess at this file's output name from the original
-   * module file.
-   */
-  guessNameFromModule(module: NodeModule) {
-    const pth = module.filename
-  }
-
 }

@@ -25,6 +25,7 @@ export class TextNode extends Node {
   }
 }
 
+
 /**
  * The base node.
  */
