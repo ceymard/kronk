@@ -1,11 +1,15 @@
+
+export type Child = string | number | Node | (() => Child)
+
 export interface Attributes {
-  // $$children?: Child | Child[]
-  [name: string]: string
+  $$children?: Child | Child[]
 }
+
+export type Attrs<T> = Attributes & T
 
 export abstract class Node {
 
-  constructor(children: Node[]) { }
+  constructor(public children: Node[]) { }
 
   abstract render(indent: string): string
 
@@ -39,7 +43,7 @@ export class TagNode extends Node {
     var attributes = a == null ? '' :
       ' ' + Object.keys(a).map(key => `${key}="${(a as any)![key]}"`).join(' ')
 
-    var res = `${indent}<${this.tagname}${attributes}>${this.children.map(c => '\n' + c.toString(indent + '  '))}
+    var res = `${indent}<${this.tagname}${attributes}>${this.children.map(c => '\n' + c.render(indent + '  '))}
 ${indent}</${this.tagname}>`
 
     return res

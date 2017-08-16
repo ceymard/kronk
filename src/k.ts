@@ -1,7 +1,4 @@
-import {Node, TextNode, TagNode, Attributes} from './node'
-
-
-export type Child = string | number | Node | (() => Child)
+import {Node, TextNode, TagNode, Attributes, Child} from './node'
 
 
 export type FunctionComponent = (attrs: Attributes | null, children: Node[]) => Node
