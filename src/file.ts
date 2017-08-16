@@ -8,7 +8,7 @@ export class File {
 
   static root: string
 
-  constructor(public render: FileGenerator, public name: string = '') {
+  constructor(public render: FileGenerator, public filename: string = '') {
 
   }
 

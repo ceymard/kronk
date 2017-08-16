@@ -1,4 +1,4 @@
-import {Node, Attributes, Child} from './node'
+import {Node, Attributes, Child, Attrs} from './node'
 
 declare global {
 
@@ -26,6 +26,7 @@ declare global {
     }
     type ElementClass = ElementClassFn;
     interface IntrinsicElements {
+        meta: Attrs<{charset?: string, content?: string, name?: string}>
         [name: string]: Attributes;
     }
   }

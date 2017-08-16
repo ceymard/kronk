@@ -16,10 +16,11 @@ export type ComponentInstanciator<T extends Component> =
 
 
 function _isComponentInstanciator(b: any): b is ComponentInstanciator<any> {
-  if (typeof (b as any).prototype.render === 'function')
+  if (b.prototype && typeof (b as any).prototype.render === 'function')
     return true
   return false
 }
+
 
 
 function _getNodes(children: Child[]) {
@@ -28,6 +29,8 @@ function _getNodes(children: Child[]) {
       return c
     if (typeof c === 'string' || typeof c === 'number')
       return new TextNode(c.toString())
+    if (typeof c === 'function')
+      return c()
     throw new Error('incorrect child type')
   })
 }
@@ -57,3 +60,6 @@ export function k(
 
   return new TagNode(base, attrs, children)
 }
+
+// Needed for templates.
+(global as any).K = k

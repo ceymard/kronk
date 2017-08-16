@@ -1,3 +1,4 @@
+import {Node} from './node'
 import {File} from './file'
 
 export type TemplateFunction<T> = (context: T) => Node
@@ -22,4 +23,3 @@ export abstract class Template {
     abstract Main(): Node
 
 }
-
